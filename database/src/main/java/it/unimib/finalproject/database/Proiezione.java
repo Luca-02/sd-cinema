@@ -48,19 +48,19 @@ public class Proiezione implements Serializable {
         this.sala = sala;
     }
 
-    public String getData() {
+    public LocalDate getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(LocalDate data) {
         this.data = data;
     }
 
-    public String getOrario() {
+    public LocalTime getOrario() {
         return orario;
     }
 
-    public void setOrario(String orario) {
+    public void setOrario(LocalTime orario) {
         this.orario = orario;
     }
 

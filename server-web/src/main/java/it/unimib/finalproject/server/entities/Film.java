@@ -1,4 +1,4 @@
-package it.unimib.finalproject.database;
+package it.unimib.finalproject.server.entities;
 
 import java.io.Serializable;
 
@@ -8,8 +8,16 @@ public class Film implements Serializable {
     private String film;
     private int durataMinuti;
 
+    public Film() {
+    }
+
     public Film(int id, String film, int durataMinuti) {
         this.id = id;
+        this.film = film;
+        this.durataMinuti = durataMinuti;
+    }
+
+    public Film(String film, int durataMinuti) {
         this.film = film;
         this.durataMinuti = durataMinuti;
     }

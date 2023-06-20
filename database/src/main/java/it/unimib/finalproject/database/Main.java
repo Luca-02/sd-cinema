@@ -7,9 +7,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,23 +29,23 @@ public class Main {
     /**
      * Popolo il database
      */
-    static {
-        Film f = new Film(0, "film1", 120);
-        filmMap.put(f.getId(), f);
-
-        Sala s = new Sala(0, "sala1", 3, 3);
-        saleMap.put(s.getId(), s);
-
-        Proiezione pro = new Proiezione(0, f, s, "00/00/0000", "12:30");
-        proiezioniMap.put(pro.getId(), pro);
-
-        List<Posto> posti = new ArrayList<>();
-        posti.add(new Posto(0, 0));
-        posti.add(new Posto(0, 1));
-
-        Prenotazione pre = new Prenotazione(0, pro.getId(), posti);
-        prenotazioniMap.put(pre.getId(), pre);
-    }
+//    static {
+//        Film f = new Film(0, "film1", 120);
+//        filmMap.put(f.getId(), f);
+//
+//        Sala s = new Sala(0, "sala1", 3, 3);
+//        saleMap.put(s.getId(), s);
+//
+//        Proiezione pro = new Proiezione(0, f, s, "00/00/0000", "12:30");
+//        proiezioniMap.put(pro.getId(), pro);
+//
+//        List<Posto> posti = new ArrayList<>();
+//        posti.add(new Posto(0, 0));
+//        posti.add(new Posto(0, 1));
+//
+//        Prenotazione pre = new Prenotazione(0, pro.getId(), posti);
+//        prenotazioniMap.put(pre.getId(), pre);
+//    }
 
     public Main(String address, Integer port) throws IOException {
         listenAddress = new InetSocketAddress(address, port);
