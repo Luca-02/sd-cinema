@@ -19,4 +19,4 @@ Il client Web è invece un solo file HTML chiamato `index.html`, può essere ape
 
 ## Porte e indirizzi
 
-Il server Web si pone in ascolto all'indirizzo `localhost` alla porta `3030`. Il database si pone in ascolto allo stesso indirizzo del server Web ma alla porta `3030`.
+Il server Web si pone in ascolto all'indirizzo `localhost` alla porta `8080`. Il database si pone in ascolto allo stesso indirizzo del server Web ma alla porta `3030`.

@@ -23,20 +23,20 @@ public class TestResource {
      */
     public static final int PORT = 3030;
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getTest() throws InterruptedException {
-        ClientChannel c = null;
-        try {
-            c = new ClientChannel("localhost", PORT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        assert c != null;
-        c.start();
-
-        return Response.status(Response.Status.ACCEPTED).build();
-    }
+//    @GET
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response getTest() throws InterruptedException {
+//        ClientChannel c = null;
+//        try {
+//            c = new ClientChannel("localhost", PORT);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        assert c != null;
+//        c.start();
+//
+//        return Response.status(Response.Status.ACCEPTED).build();
+//    }
 
     /* - */
 

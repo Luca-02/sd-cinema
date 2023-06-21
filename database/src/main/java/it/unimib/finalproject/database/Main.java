@@ -3,10 +3,13 @@ package it.unimib.finalproject.database;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,10 +20,7 @@ public class Main {
      */
     public static final int PORT = 3030;
 
-    private static ConcurrentHashMap<Integer, Film> filmMap = new ConcurrentHashMap<>();
-    private static ConcurrentHashMap<Integer, Sala> saleMap = new ConcurrentHashMap<>();
-    private static ConcurrentHashMap<Integer, Proiezione> proiezioniMap = new ConcurrentHashMap<>();
-    private static ConcurrentHashMap<Integer, Prenotazione> prenotazioniMap = new ConcurrentHashMap<>();
+    protected static ConcurrentHashMap<String, String> database = new ConcurrentHashMap<>();
 
     private static boolean listen = false;
     private Selector selector;
@@ -29,23 +29,13 @@ public class Main {
     /**
      * Popolo il database
      */
-//    static {
-//        Film f = new Film(0, "film1", 120);
-//        filmMap.put(f.getId(), f);
-//
-//        Sala s = new Sala(0, "sala1", 3, 3);
-//        saleMap.put(s.getId(), s);
-//
-//        Proiezione pro = new Proiezione(0, f, s, "00/00/0000", "12:30");
-//        proiezioniMap.put(pro.getId(), pro);
-//
-//        List<Posto> posti = new ArrayList<>();
-//        posti.add(new Posto(0, 0));
-//        posti.add(new Posto(0, 1));
-//
-//        Prenotazione pre = new Prenotazione(0, pro.getId(), posti);
-//        prenotazioniMap.put(pre.getId(), pre);
-//    }
+    static {
+        database.put("film:0", "\"{'id': 0, 'nome': 'Il padrino', 'durataMinuti': 175}\"");
+        database.put("film:1", "\"{'id': 1, 'nome': 'Schindler's List', 'durataMinuti': 195}\"");
+        database.put("film:2", "\"{'id': 2, 'nome': 'Il Signore degli Anelli: Il ritorno del re', 'durataMinuti': 201}\"");
+        database.put("film:3", "\"{'id': 3, 'nome': 'Pulp Fiction ', 'durataMinuti': 154}\"");
+        database.put("film:4", "\"{'id': 4, 'nome': 'Fight Club', 'durataMinuti': 139}\"");
+    }
 
     public Main(String address, Integer port) throws IOException {
         listenAddress = new InetSocketAddress(address, port);
@@ -111,13 +101,12 @@ public class Main {
         SocketChannel clientSocket = (SocketChannel) key.channel();
 
         int BUFFER_SIZE = 1024;
-        ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
         try {
             if (clientSocket.read(buffer) == -1) {
-                clientSocket.close();
-                key.cancel();
-                System.out.println("Connection closed by client: " + clientSocket.socket().getRemoteSocketAddress());
+                closeClientConnection(key, clientSocket);
+                System.out.println("Connection closed to client: " + clientSocket.socket().getRemoteSocketAddress());
                 return;
             }
         } catch (Exception e) {
@@ -125,35 +114,25 @@ public class Main {
         }
 
         buffer.flip();
-        byte[] data = new byte[buffer.remaining()];
-        buffer.get(data);
-
-        List<String> receivedObject = null;
-        try {
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
-            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-            receivedObject = (List<String>) objectInputStream.readObject();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        System.out.println(receivedObject);
-        buffer.flip();
-
-        Film objectToSend = filmMap.get(0);
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-        objectOutputStream.writeObject(objectToSend);
-        objectOutputStream.flush();
-        byte[] serializedObject = byteArrayOutputStream.toByteArray();
-
-        buffer = ByteBuffer.wrap(serializedObject);
-        clientSocket.write(buffer);
-
+        CharBuffer charBuffer = StandardCharsets.UTF_8.newDecoder().decode(buffer);
         buffer.clear();
-        byteArrayOutputStream.close();
-        objectOutputStream.close();
+
+        String request = charBuffer.toString().trim();
+
+        System.out.println("[Client: " + clientSocket.socket().getRemoteSocketAddress() +
+                ", Request: " + request +
+                ", Time: " + LocalDateTime.now() + "]");
+
+        HandlerRequest.handle(request, clientSocket);
+
+        clientSocket.close();
+        key.cancel();
+    }
+
+    public void closeClientConnection(SelectionKey key, SocketChannel clientSocket) throws IOException {
+        clientSocket.close();
+        key.cancel();
+        System.out.println("Connection closed to client: " + clientSocket.socket().getRemoteSocketAddress());
     }
 
     public static void main(String[] args) {
