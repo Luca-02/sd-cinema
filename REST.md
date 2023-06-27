@@ -1,6 +1,24 @@
 # Progetto Sistemi Distribuiti 2022-2023 - API REST
 
-Documentazione delle API REST di esempio. Si assume che i dati vengano scambiati in formato JSON.
+Documentazione delle API REST. Si assume che i dati vengano scambiati in formato JSON.
+
+## `/api/film`
+
+* ### GET
+
+    **Descrizione**: Restituisce l'elenco di tutti i film.
+    
+    **Parametri**: None
+    
+    **Body richiesta**: None
+    
+    **Risposta**: Viene restituita la rappresentazione in JSON di tutti i film, un oggetto JSON con i campi `id: int`, `film: string` e `durataMinuti: int`
+    
+    **Codici di stato restituiti**:
+    
+    * 200 OK
+
+---
 
 ## `/contacts`
 

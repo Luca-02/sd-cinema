@@ -2,51 +2,46 @@ package it.unimib.finalproject.server.entities;
 
 import java.io.Serializable;
 
-public class Posto implements Serializable {
+public class Posto implements Serializable, Comparable<Posto> {
 
-    int id;
-    int row;
-    int column;
+    Integer id;
+    Integer row;
+    Integer column;
 
-    public Posto() {
-    }
-
-    public Posto(int id, int row, int column) {
-        this.id = id;
-        this.row = row;
-        this.column = column;
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getRow() {
+    public Integer getRow() {
         return row;
     }
 
-    public void setRow(int row) {
+    public void setRow(Integer row) {
         this.row = row;
     }
 
-    public int getColumn() {
+    public Integer getColumn() {
         return column;
     }
 
-    public void setColumn(int column) {
+    public void setColumn(Integer column) {
         this.column = column;
     }
 
     @Override
+    public int compareTo(Posto o) {
+        return id.compareTo(o.getId());
+    }
+
+    @Override
     public String toString() {
-        return "Posto{" +
-                "row=" + row +
-                ", column=" + column +
-                '}';
+        return "{\"id\": " + id +
+                ", \"row\": " + row +
+                ", \"column\": " + column + "}";
     }
 
 }

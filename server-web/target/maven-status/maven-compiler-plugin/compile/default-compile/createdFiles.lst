@@ -1,6 +1,7 @@
-it\unimib\finalproject\server\handler\HandlerPrenotazioni.class
 it\unimib\finalproject\server\Main.class
+it\unimib\finalproject\server\Test\Test.class
 it\unimib\finalproject\server\entities\Proiezione.class
+it\unimib\finalproject\server\handler\HandlerResponse.class
 it\unimib\finalproject\server\entities\Film.class
 it\unimib\finalproject\server\ClientChannel.class
 it\unimib\finalproject\server\TestResource.class

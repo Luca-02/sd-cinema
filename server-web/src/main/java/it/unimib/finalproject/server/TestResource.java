@@ -23,21 +23,6 @@ public class TestResource {
      */
     public static final int PORT = 3030;
 
-//    @GET
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response getTest() throws InterruptedException {
-//        ClientChannel c = null;
-//        try {
-//            c = new ClientChannel("localhost", PORT);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        assert c != null;
-//        c.start();
-//
-//        return Response.status(Response.Status.ACCEPTED).build();
-//    }
-
     /* - */
 
     private static ConcurrentHashMap<Integer, Film> filmMapTest = new ConcurrentHashMap<>();
@@ -77,22 +62,22 @@ public class TestResource {
         pro.setIdSala(saleMapTest.get(0).getId());
         pro.setData("2005-05-12");
         pro.setOrario("10:15");
-        pro.setPrenotazioni(new ArrayList<>());
+//        pro.setPrenotazioni(new ArrayList<>());
         proiezioniMapTest.put(pro.getId(), pro);
 
         Prenotazione pre = new Prenotazione();
         pre.setId(0);
         pre.setData("2005-05-11");
         pre.setOrario("20:30");
-        pre.setPosti(new ArrayList<>());
-        proiezioniMapTest.get(0).getPrenotazioni().add(pre);
+//        pre.setPosti(new ArrayList<>());
+//        proiezioniMapTest.get(0).getPrenotazioni().add(pre);
 
         pre = new Prenotazione();
         pre.setId(1);
         pre.setData("2005-04-11");
         pre.setOrario("20:00");
-        pre.setPosti(new ArrayList<>());
-        proiezioniMapTest.get(0).getPrenotazioni().add(pre);
+//        pre.setPosti(new ArrayList<>());
+//        proiezioniMapTest.get(0).getPrenotazioni().add(pre);
 
         List<Posto> posti = new ArrayList<>();
         Posto posto = new Posto();
@@ -105,7 +90,7 @@ public class TestResource {
         posto.setRow(3);
         posto.setColumn(3);
         posti.add(posto);
-        pre.setPosti(posti);
+//        pre.setPosti(posti);
     }
 
     @Path("/film")
@@ -232,7 +217,7 @@ public class TestResource {
                             entryList.get(entryList.size() - 1).getId() + 1 : 0;
 
             obj.setId(id);
-            obj.setPrenotazioni(new ArrayList<>());
+//            obj.setPrenotazioni(new ArrayList<>());
             proiezioniMapTest.put(obj.getId(), obj);
 
             var uri = new URI("test/api/proiezione/" + obj.getId());
@@ -257,29 +242,13 @@ public class TestResource {
             return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    /*
+
     @Path("/proiezione/{id}/prenotazione")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Prenotazione> getPrenotazione(@PathParam("id") int idProiezione) {
         return new ArrayList<>(proiezioniMapTest.get(idProiezione).getPrenotazioni());
-    }
-
-    @Path("/proiezione/{id}/prenotazione/{id2}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getPrenotazione(@PathParam("id") int idProiezione,
-                                    @PathParam("id2") int idPrenotazione) {
-        var proiezione = proiezioniMapTest.get(idProiezione);
-        if (proiezione != null) {
-            for (Prenotazione prenotazione : proiezione.getPrenotazioni()) {
-                if (prenotazione.getId() == idPrenotazione)
-                    return Response.ok(prenotazione).build();
-            }
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
     }
 
     @Path("/proiezione/{id}/prenotazione")
@@ -311,6 +280,24 @@ public class TestResource {
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
             return Response.serverError().build();
+        }
+    }
+
+    @Path("/proiezione/{id}/prenotazione/{id2}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPrenotazione(@PathParam("id") int idProiezione,
+                                    @PathParam("id2") int idPrenotazione) {
+        var proiezione = proiezioniMapTest.get(idProiezione);
+        if (proiezione != null) {
+            for (Prenotazione prenotazione : proiezione.getPrenotazioni()) {
+                if (prenotazione.getId() == idPrenotazione)
+                    return Response.ok(prenotazione).build();
+            }
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        else {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
 
@@ -358,5 +345,7 @@ public class TestResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
+
+     */
 
 }

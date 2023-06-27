@@ -2,25 +2,11 @@ package it.unimib.finalproject.server.entities;
 
 import java.io.Serializable;
 
-public class Film implements Serializable {
+public class Film implements Serializable, Comparable<Film> {
 
-    private int id;
+    private Integer id;
     private String film;
-    private int durataMinuti;
-
-    public Film() {
-    }
-
-    public Film(int id, String film, int durataMinuti) {
-        this.id = id;
-        this.film = film;
-        this.durataMinuti = durataMinuti;
-    }
-
-    public Film(String film, int durataMinuti) {
-        this.film = film;
-        this.durataMinuti = durataMinuti;
-    }
+    private Integer durataMinuti;
 
     public int getId() {
         return id;
@@ -38,20 +24,30 @@ public class Film implements Serializable {
         this.film = film;
     }
 
-    public int getDurataMinuti() {
+    public Integer getDurataMinuti() {
         return durataMinuti;
     }
 
-    public void setDurataMinuti(int durataMinuti) {
+    public void setDurataMinuti(Integer durataMinuti) {
         this.durataMinuti = durataMinuti;
+    }
+
+    public boolean notNullAttributes() {
+        return  id != null &&
+                film != null &&
+                durataMinuti != null;
+    }
+
+    @Override
+    public int compareTo(Film o) {
+        return id.compareTo(o.getId());
     }
 
     @Override
     public String toString() {
-        return "Film{" +
-                "id=" + id +
-                ", film='" + film + '\'' +
-                ", durataMinuti=" + durataMinuti +
-                '}';
+        return "{\"id\": " + id +
+                ", \"film\": \"" + film + "\"" +
+                ", \"durataMinuti\": " + durataMinuti + "}";
     }
+
 }

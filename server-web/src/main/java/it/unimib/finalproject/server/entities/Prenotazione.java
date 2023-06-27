@@ -1,31 +1,24 @@
 package it.unimib.finalproject.server.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
-public class Prenotazione implements Serializable {
+public class Prenotazione implements Serializable, Comparable<Prenotazione> {
 
-    private int id;
+    private Integer id;
     private String data;
     private String orario;
     private List<Posto> posti;
-
-    public Prenotazione() {
-    }
-
-    public Prenotazione(int id, String data, String orario) {
-        this.id = id;
-        this.data = data;
-        this.orario = orario;
-        this.posti = new ArrayList<>();
-    }
 
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -54,10 +47,14 @@ public class Prenotazione implements Serializable {
     }
 
     @Override
+    public int compareTo(Prenotazione o) {
+        return id.compareTo(o.getId());
+    }
+
+    @Override
     public String toString() {
-        return "Prenotazione{" +
-                "id=" + id +
-                ", postiPrenotazione=" + posti +
-                '}';
+        return "{\"id\": " + id +
+                ", \"data\": \"" + data + "\"" +
+                ", \"orario\": \"" + orario + "\"}";
     }
 }
