@@ -1,4 +1,4 @@
-package it.unimib.finalproject.server.Utility;
+package it.unimib.finalproject.server.utility;
 
 import java.text.SimpleDateFormat;
 

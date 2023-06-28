@@ -1,9 +1,7 @@
 package it.unimib.finalproject.server.entities;
 
-import it.unimib.finalproject.server.Utility.DateTimeFormat;
-
+import it.unimib.finalproject.server.utility.DateTimeFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Proiezione implements Comparable<Proiezione> {

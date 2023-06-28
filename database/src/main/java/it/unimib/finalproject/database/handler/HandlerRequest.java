@@ -1,4 +1,6 @@
-package it.unimib.finalproject.database;
+package it.unimib.finalproject.database.handler;
+
+import it.unimib.finalproject.database.Main;
 
 import java.util.ArrayList;
 import java.util.List;

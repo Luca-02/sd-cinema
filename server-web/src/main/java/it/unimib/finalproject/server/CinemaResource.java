@@ -64,13 +64,12 @@ public class CinemaResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addFilm(String body) {
-        String command = "MSGETALL film:";
-
         try {
             String[] response;
             int newId;
-
             boolean isSet = false;
+
+            String command = "MSGETALL film:";
 
             synchronized (this) {
                 response = HandlerResponse.parseResponse(socketRequest(command));
@@ -163,13 +162,12 @@ public class CinemaResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addSala(String body) {
-        String command = "MSGETALL sala:";
-
         try {
             String[] response;
             int newId;
-
             boolean isSet = false;
+
+            String command = "MSGETALL sala:";
 
             synchronized (this) {
                 response = HandlerResponse.parseResponse(socketRequest(command));
@@ -262,13 +260,12 @@ public class CinemaResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addProiezione(String body) {
-        String command = "MSGETALL proiezione:";
-
         try {
             String[] response;
             int newId;
-
             boolean isSet = false;
+
+            String command = "MSGETALL proiezione:";
 
             synchronized (this) {
                 response = HandlerResponse.parseResponse(socketRequest(command));

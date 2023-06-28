@@ -1,5 +1,7 @@
 package it.unimib.finalproject.database;
 
+import it.unimib.finalproject.database.handler.HandlerRequest;
+
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -19,7 +21,7 @@ public class Main {
     public static final int PORT = 3030;
     public static final int BUFFER_SIZE = 1024;
 
-    protected static ConcurrentHashMap<String, String> database = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, String> database = new ConcurrentHashMap<>();
 
     private static boolean listen = false;
     private static Selector selector;
