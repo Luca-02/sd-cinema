@@ -1,204 +1,643 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
-    <title>Subscribed Users</title>
-  </head>
+<head>
+	<title>Cinema</title>
+</head>
 
-  <body>
-    <h2>Add a new contact</h2>
+<body>
+	<div id="homepage">
+		<button id="btn-projections">Mostra lista proiezioni</button><br>
+		<button id="btn-manage-reservation">Gestisci prenotazione</button>
+	</div>
+	<div id="projections">
+		<h2>Proiezioni</h2>
+		<table id="tabella-proiezioni" border="1">
+			<thead>
+				<tr>
+					<!-- <th></th> -->
+					<th>Film</th>
+					<th>Trama</th>
+					<th>Sala</th>
+					<th>Giorno</th>
+					<th>Orario</th>
+				</tr>
+			</thead>
+			<tbody id="table-body-proiezioni">
+			</tbody>
+		</table>
+		<button class="goto-homepage">Homepage</button>
+	</div>
 
-    <form id="add-contact" action="/contacts" method="POST">
-      <label for="input-name">Name: </label>
-      <input type="text" id="input-name" required>
-      <p />
-      <label for="input-number">Number: </label>
-      <input type="text" id="input-number" required>
-      <p />
-      <input type="submit" value="Subscribe!">
-    </form>
+	<div id="reservations">
+		<h2 id="info-prenotazione">Prenotazione</h2>
+		<table id="seleziona-posti" border="1">
+		</table>
+		<form id="form-prenotazione">
+			<label for="posti">Posti selezionati:</label>
+			<input type="text" id="posti" name="posti" value="" readonly><br>
+			<input type="text" id="id-proiezione" readonly hidden>
+			<button type="submit">Prenota</button>
+			<button type="button">Torna indietro</button>
+			<button type="button" class="goto-homepage">Homepage</button>
+		</form>
+	</div>
 
-    <hr />
+	<hr />
 
-    <h2>Contact list</h2>
+	<div id="manage-reservation">
+		<h2>Gestisci la tua prenotazione</h2>
+		<form id="form-cerca-prenotazione">
+			<label for="id-prenotazione">Codice prenotazione</label>
+			<input type="text" id="id-prenotazione" name="id-prenotazione">
+			<button type="submit">Ricerca prenotazione</button><br>
+			<button type="button" class="goto-homepage">Homepage</button>
+		</form>
+		<div id="div-modifica-prenotazione" style="display: none">
+			<table id="tabella-modifica-prenotazione" border="1">
+			</table>
+			<form id="modifica-prenotazione">
+				<label for="posti-da-cancellare">Posti da cancellare:</label>
+				<input type="text" id="posti-da-cancellare" name="posti-da-cancellare" value="" readonly><br>
+				<input type="text" id="id-proiezione-mod" readonly hidden>
+				<input type="text" id="id-prenotazione-mod" readonly hidden>
+				<input type="text" id="id-posti-da-cancellare" readonly>
+				<button type="submit">Elimina posti selezionati</button>
+			</form>
+			<form id="cancella-prenotazione">
+				<button type="submit">Elimina prenotazione</button>
+			</form>
+		</div>
+	</div>
+	<script>
+		const API_URI = "http://localhost:8080/test/api";
 
-    <table border="1">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Number</th>
-        </tr>
-      </thead>
-      <tbody id="table-body">
+		const PANEL_IDS = ["homepage", "projections", "reservations",
+			"manage-reservation"];
 
-      </tbody>
-    </table>
-    <script>
-      const API_URI = "http://localhost:8080";
+		const PROJECTION_DIV_ID = "lista-proiezioni";
+		const RESERVATION_DIV_ID = "prenotazione";
+		const SEATS_TABLE_ID = "seleziona-posti";
+		const SEATS_INPUT_ID = "posti";
+		const RESERVATION_FORM_ID = "form-prenotazione";
 
-      // getUsers restituisce i contatti nella rubrica telefonica.
-      async function getContacts() {
-        // Bisogna effettuare i seguenti passi:
-        //
-        //	1. Chiamare GET "http://localhost:8080/contacts",
-        //	2. Controllare che la chiamata abbia avuto successo,
-        //	3. Restituise l'oggetto (lista di contatti) facendo il parsing del JSON.
+		async function getRequest(endpoint) {
+			const response = await fetch(endpoint);
 
-        // L'interpolazione di stringhe permette di inserire espressioni in un
-        // letterale. Comodo per costruire stringhe speciali.
-        //
-        // Info: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
-        const endpoint = `${API_URI}/contacts`;
+			if (!response.ok)
+				throw new Error(`Response from "${endpoint}" was not successful:
+				${response.status} ${response.statusText}`);
 
-        // Senza parametri, a parte l'URL, fa una chiamata GET. fetch è
-        // asincrona, per questo uso await.
-        const response = await fetch(endpoint);
+			return response;
+		}
 
-        // Controllo di eventuali errori.
-        if (!response.ok)
-          throw new Error(`Response from "${endpoint}" was not successful: ${response.status} ${response.statusText}`);
+		async function postRequest(endpoint, obj) {
+			const response = await fetch(endpoint, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(obj)
+			});
 
-        // Effettua il parsing del JSON e restituisce l'oggetto. Il parsing
-        // avviene in modo asicrono, per questo uso "await".
-        return await response.json();
-      }
+			if (!response.ok)
+				throw new Error(`Response from "${endpoint}" was not successful:
+				${response.status} ${response.statusText}`);
 
-      // getContact restituisce il singolo contatto.
-      async function getContact(id) {
-        // La funzione è molto simile a getContacts. Bisogna effettuare i
-        // seguenti passi:
-        //
-        //	1. Chiamare GET "http://localhost:8080/contacts/{id}",
-        //	2. Controllare che la chiamata abbia avuto successo,
-        //	3. Restituise l'oggetto (il contatto) facendo il parsing del JSON.
-        const endpoint = `${API_URI}/contacts/${id}`;
+			const location = response.headers.get("Location");
 
-        const response = await fetch(endpoint);
+			// Fa lo split e restituisce l'ultima sottostringa, che è l'ID.
+			return location.split("/").pop();
+		}
 
-        if (!response.ok)
-          throw new Error(`Response from "${endpoint}" was not successful: ${response.status} ${response.statusText}`);
+		async function deleteRequest(endpoint) {
+			const response = await fetch(endpoint, {
+				method: "DELETE",
+			});
 
-        return await response.json();
-      }
+			if (!response.ok)
+				throw new Error(`Response from "${endpoint}" was not successful:
+				${response.status} ${response.statusText}`);
 
-      // newContact aggiunge un contatto al server, restituisce il nuovo ID.
-      async function newContact(contact) {
-        // Bisogna effettuare i seguenti passi:
-        //
-        //	1. Chiamare POST "http://localhost:8080/contacts" con
-        //		 nel body la rappresentazione JSON del nuovo utente,
-        //	2. Controllare che la chiamata abbia avuto successo,
-        //	3. Controllare l'header "Location", estrarre l'ID alla fine
-        //		 e restituirlo.
-        const endpoint = `${API_URI}/contacts`;
+			//TODO: che faccio?
+		}
 
-        // In questo caso nella fetch devo passare delle opzioni:
-        //	* method: per indicare il metodo utilizzato,
-        //	* headers: gli header utilizati,
-        //	* body: il body della richiesta.
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(contact)
-        });
+		// restituisce la lista delle proiezioni disponibili
+		async function getMovieProjections() {
+			const endpoint = `${API_URI}/proiezione`;
+			const response = await getRequest(endpoint);
+			return await response.json();
+		}
 
-        if (!response.ok)
-          throw new Error(`Response from "${endpoint}" was not successful: ${response.status} ${response.statusText}`);
+		async function getRoomById(roomId) {
+			const endpoint = `${API_URI}/sala/${roomId}`;
+			const response = await getRequest(endpoint);
 
-        const location = response.headers.get("Location");
+			return await response.json();
+		}
 
-        // Fa lo split e restituisce l'ultima sottostringa, che è l'ID.
-        return location.split("/").pop();
+		async function getReservation(projId, reservationId) {
+			const endpoint = `${API_URI}/proiezione/${projId}/prenotazione/
+				${reservationId}`;
 
-      }
+			const response = await getRequest(endpoint);
 
-      // Funziona di utilità che mostra l'errore nella console e in un alert
-      // del browser.
-      function onError(msg, error) {
-        const out = `${msg}: ${error}`;
-        console.error(out);
-        alert(out);
-      }
+			return await response.json();
+		}
 
-      // newContactDOM viene eseguita all'invio del from. Aggiunge un nuovo
-      // contatto, prima inviandolo al server e poi mettendolo nella tabella.
-      async function newContactDOM(event) {
-        // Evito che il form venga davvero inviato.
-        event.preventDefault();
+		async function deleteSeats(projId, reservationId, seatsArr) {
+			for (let i = 0; i < seatsArr.length; i++) {
+				let seatId = seatsArr[i];
 
-        // Recuperi i dati da inviare dal form.
-        const name = document.getElementById("input-name");
-        const number = document.getElementById("input-number");
-        let contact = {
-          "name": name.value,
-          "number": number.value
-        };
+				let endpoint = `${API_URI}/proiezione/${projId}/prenotazione/
+				${reservationId}/posto/${seatId}`;
 
-        // Pulisco i campi del form, ormai non servono più.
-        name.value = "";
-        number.value = "";
+				await deleteRequest(endpoint);
+			}
+		}
 
-        try {
-          // Creo il nuovo oggetto e lo invio al server, restituisce il
-          // nuovo ID.
-          contact["id"] = await newContact(contact)
+		// Funziona di utilità che mostra l'errore nella console e in un alert
+		// del browser.
+		function onError(msg, error) {
+			const out = `${msg}: ${error}`;
+			console.error(out);
+			alert(out);
+		}
 
-          // Ottengo il nuovo contatto con tutte le informazioni.
-          contact = await getContact(contact["id"]);
+		async function searchReservation(event) {
+			event.preventDefault();
 
-          // Infine lo aggiungo alla tabella.
-          addContactDOM(contact);
-        } catch (error) {
-          onError("Failed to add a new user", error);
-        }
-      }
+			let projId = 0; //TODO 
+			let reservationId = document.getElementById("id-prenotazione").value;
 
-      // addContactDOM aggiunge il contatto fornito in una nuova riga della tabella.
-      function addContactDOM(contact) {
-        // Selezione di <tbody> e aggiunta di una nuova riga.
-        const tbody = document.getElementById("table-body");
-        const row = tbody.insertRow();
+			let reservationObj = await getReservation(projId, reservationId);
 
-        // Aggiunta dell'ID.
-        const id = row.insertCell();
-        id.setAttribute("align", "center");
-        const idText = document.createTextNode(contact["id"]);
-        id.appendChild(idText);
+			//aggiungo info sulla sala
+			const roomObj = await getRoomById(projId);
 
-        // Aggiunta del nome.
-        const name = row.insertCell();
-        name.setAttribute("align", "center");
-        const nameText = document.createTextNode(contact["name"]);
-        name.appendChild(nameText);
+			showEditReservationSubPanel(reservationObj, roomObj, projId);
+			//return {"reservation": reservationObj, "room": roomObj};
+		}
 
-        // Aggiunta del numero.
-        const number = row.insertCell();
-        number.setAttribute("align", "center");
-        const numberText = document.createTextNode(contact["number"]);
-        number.appendChild(numberText);
-      }
 
-      // Ho definito init come una funzione asincrona, per cui l'esecuzione è slegata
-      // dal flusso sequenziale dello script. Il browser si occupa di gestire queste
-      // funzioni, che prima o poi verranno eseguite e completate.
-      window.onload = init();
+		async function deleteReservedSeats(event) {
+			event.preventDefault();
+			let reservationId = document.
+				getElementById("id-prenotazione-mod").value;
 
-      async function init() {
-        // getUsers è asincrona, per cui restituisce una Promise che verrà eseguita
-        // in modo asincrono. Il metodo then permette di eseguire due funzioni: la
-        // prima in caso di successo, la seconda in caso di errore.
-        getContacts().then((users) => users.forEach(addContactDOM),
-          (error) => onError("Failed to get users", error));
+			let projectionId = document.
+				getElementById("id-proiezione-mod").value;
 
-        // Aggiungo l'handler per l'evento di invio al form.
-        const form = document.getElementById("add-contact");
-        form.addEventListener("submit", newContactDOM);
-      }
+			let seats = document.getElementById("id-posti-da-cancellare").value;
+			const seatsToDelete = seats.split(';');
+			seatsToDelete.pop();
 
-    </script>
-  </body>
+			try {
+				deleteSeats(projectionId, reservationId, seatsToDelete);
+				alert("Seats removed successfully!");
+				await searchReservation(event);
+			} catch(error) {
+				onError("Failed to delete seats", error);	
+			}
+		}
+
+		async function deleteReservation(event) {
+			event.preventDefault();
+
+		}
+
+		async function newReservation(event) {
+			// Evito che il form venga davvero inviato.
+			event.preventDefault();
+
+			// Recuperi i dati da inviare dal form.
+			const projectionInpt = document.getElementById("id-proiezione");
+			let projId = projectionInpt.value;
+
+			let reservationObj = extractReservationObj();
+
+			try {
+				// Creo il nuovo oggetto e lo invio al server, restituisce il
+				// nuovo ID.
+
+				const endpoint = `${API_URI}/proiezione/${projId}/prenotazione`;
+				reservationObj["id"] = await postRequest(endpoint, reservationObj);
+
+				let successMsg = "The reservation has been made successfully.\n" +
+					"Remember the following reservation ID in order to manage it " +
+					"in the future:\n" +
+					"Id: " + reservationObj["id"];
+
+				alert(successMsg);
+				showHomepage();
+			} catch (error) {
+				onError("Failed to perform the reservation", error);
+			}
+		}
+
+		function extractReservationObj() {
+			const seatsList = extractSeatsList();
+
+			let reservationObj = {
+				"posti": seatsList
+			}
+
+			return reservationObj;
+		}
+
+		function extractSeatsList() {
+			const selectedSeatsInpt = document.getElementById("posti");
+			const seats = selectedSeatsInpt.value.split(';');
+			seats.pop() //tolgo ultimo valore che è stringa vuota
+			const seatsList = [];
+
+			for (let i = 0; i < seats.length; i++) {
+				let seatRowCol = seats[i].split('-');
+				seatsList[i] = { "row": seatRowCol[0], "column": seatRowCol[1] };
+			}
+
+			return seatsList;
+		}
+
+		function addProjectionDOM(projection) {
+			const tbody = document.getElementById("table-body-proiezioni");
+			const row = tbody.insertRow();
+
+			// Aggiunta dell'id del film
+			//newTextCell(row, projection["idFilm"]);
+
+			// Aggiunta del film
+			projection["Film"] = "placeholder"; //TODO
+			newTextCell(row, projection["Film"]);
+
+			// Aggiunta della trama.
+			projection["TramaFilm"] = "blablablblablabl"; //TODO
+			newTextCell(row, projection["TramaFilm"]);
+
+			//Aggiunta della sala.
+			newTextCell(row, projection["idSala"]);
+
+			//Aggiunta della data
+			newTextCell(row, projection["data"]);
+
+			//Aggiunta dell'orario
+			newTextCell(row, projection["orario"]);
+
+			//Aggiunta action Prenota
+			newReserveButtonCell(row, projection["id"]);
+		}
+
+		function newReserveButtonCell(row, projectionId) {
+			const button = document.createElement("button");
+			const btnText = document.createTextNode("Prenota");
+			button.appendChild(btnText);
+
+			button.addEventListener("click", (event) => {
+				getProjectionReservations(projectionId).then((res) => {
+					showReservationPanel(res, res.sala, projectionId);
+
+				}, (error) => onError("error", error))
+			});
+
+			newButtonCell(row, button);
+		}
+
+		function changePanel(divName) {
+			if (PANEL_IDS.includes(divName)) {
+				for (let i = 0; i < PANEL_IDS.length; i++) {
+					let div = document.getElementById(PANEL_IDS[i]);
+
+					if (PANEL_IDS[i] == divName) {
+						div.style.display = "block";
+					}
+					else {
+						div.style.display = "none";
+					}
+				}
+			}
+		}
+
+		function newButtonCell(row, button) {
+			const cell = row.insertCell();
+			cell.appendChild(button);
+			return cell;
+		}
+
+		function newTextCell(row, content) {
+			const cell = row.insertCell();
+			cell.setAttribute("align", "center");
+			const cellText = document.createTextNode(content);
+			cell.appendChild(cellText);
+
+			return cell;
+		}
+
+		function newHeaderTextCell(row, text) {
+			const th = document.createElement("th");
+			const textNode = document.createTextNode(text);
+			th.appendChild(textNode);
+			row.appendChild(th);
+
+			return th;
+		}
+
+		async function getProjectionReservations(projectionId) {
+			const endpoint = `${API_URI}/proiezione/${projectionId}/prenotazione`;
+
+			const response = await getRequest(endpoint);
+
+			const jsonResponse = await response.json();
+
+			//aggiungo info sulla sala
+			const room = await getRoomById(projectionId);
+			jsonResponse.sala = room;
+
+			return jsonResponse;
+		}
+
+		function showReservationPanel(reservationsObj, room, projId) {
+			const seatsMatrix = createSeatsMatrix(reservationsObj, room.row,
+				room.columns);
+
+			cleanReservationPanel();
+			fillSeatsTable(SEATS_TABLE_ID, seatsMatrix, newSeatCheckbox);
+			setInputValue("id-proiezione", projId);
+			changePanel("reservations");
+		}
+
+		function cleanReservationPanel() {
+			clearTableById(SEATS_TABLE_ID);
+			cleanInptValue(SEATS_INPUT_ID); //pulisco posti selezionati
+			cleanInptValue("id-proiezione"); //pulisco id proiezione
+		}
+
+		function setInputValue(inptId, val) {
+			const inpt = document.getElementById(inptId);
+			inpt.value = val;
+		}
+
+		function cleanInptValue(inptId) {
+			document.getElementById(inptId).value = "";
+		}
+
+		function createSeatsMatrix(reservations, rows, cols) {
+			const seats = initSeatsMatrix(30, 6); //TODO sostituire con rows e cols
+			setReservedSeatsToMatrix(seats, reservations);
+
+			return seats;
+		}
+
+		//array di oggetti {"id": null, "status": 0}
+		function initSeatsMatrix(rows, cols) {
+			const seats = [];
+
+			for (let i = 0; i < rows; i++) {
+				seats[i] = [];
+				for (let j = 0; j < cols; j++) {
+					seats[i][j] = { "id": null, "status": 0 };
+				}
+			}
+
+			return seats;
+		}
+
+		function setReservedSeatsToMatrix(seats, reservations) {
+			for (let i = 0; i < reservations.length; i++) {
+				let posti = reservations[i].posti;
+
+				for (let j = 0; j < posti.length; j++) {
+					let posto = posti[j];
+					let seatObj = seats[posto.row][posto.column];
+					seatObj.status = 1;
+					seatObj.id = posto.id;
+				}
+			}
+		}
+
+		//createCheckboxAction: funzione che ha la logica di come creare la checkbox.
+		//deve avere 3 parametri: row, column e seatObj.
+		//seatObj: {"id": null, "status": 0}
+		function fillSeatsTable(tableId, seats, createCheckboxAction) {
+			const table = document.getElementById(tableId);
+			const thead = table.createTHead();
+			const tbody = table.createTBody();
+
+			let thr = thead.insertRow();
+
+			//cella vuota
+			newHeaderTextCell(thr, "");
+
+			//compongo l'header
+			for (let i = 0; i < seats[0].length; i++) {
+				newHeaderTextCell(thr, i);
+			}
+
+			//compongo il body
+			for (let i = 0; i < seats.length; i++) {
+				let tr = tbody.insertRow();
+				let rowCell = newTextCell(tr, i);
+
+				for (let j = 0; j < seats[i].length; j++) {
+					let check = createCheckboxAction(i, j, seats[i][j]);
+					let cell = tr.insertCell();
+					cell.appendChild(check);
+				}
+			}
+		}
+
+		function newSeatCheckbox(row, col, seatObj) {
+			let checkbox = newSeatCheckboxInpt(row, col);
+
+			if (seatObj.status == 1) {
+				checkbox.checked = true;
+				checkbox.disabled = true;
+			}
+
+			checkbox.addEventListener('change', function () {
+				if (this.checked) {
+					appendToInputValue(this.value + ';', SEATS_INPUT_ID);
+				}
+				else {
+					removeSeatFromInput(this.value, SEATS_INPUT_ID);
+				}
+			});
+			return checkbox;
+		}
+
+		function newManageSeatCheckbox(row, col, seatObj) {
+			let checkbox = newSeatCheckboxInpt(row, col);
+
+			if (seatObj.status == 1) {
+				checkbox.checked = true;
+				checkbox.disabled = false;
+			}
+			else {
+				checkbox.checked = false;
+				checkbox.disabled = true;
+			}
+
+			checkbox.addEventListener('change', function () {
+				if (this.checked) {
+					removeSeatFromInput(this.value, "posti-da-cancellare");
+					removeSeatFromInput(seatObj.id, "id-posti-da-cancellare");
+				}
+				else {
+					appendToInputValue(this.value + ';', "posti-da-cancellare");
+					appendToInputValue(seatObj.id + ';', "id-posti-da-cancellare");
+				}
+			});
+			return checkbox;
+		}
+
+		function newSeatCheckboxInpt(row, col) {
+			const checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
+			checkbox.name = "";
+			checkbox.value = "" + row + "-" + col;
+
+			return checkbox;
+		}
+
+		function appendToInputValue(content, inptId) {
+			const inpt = document.getElementById(inptId);
+
+			let val = inpt.value;
+			inpt.value = val + content;
+		}
+
+		function removeSeatFromInput(content, inptId) {
+			const inpt = document.getElementById(inptId);
+
+			let val = inpt.value;
+			let selectedSeats = val.split(';');
+
+			inpt.value = selectedSeats.filter(function (seat) {
+				return seat != content
+			}).join(';');
+		}
+
+		function clearTableById(tableId) {
+			const table = document.getElementById(tableId);
+			table.deleteTHead();
+
+			const tbody = table.getElementsByTagName('tbody')[0];
+
+			if (tbody) {
+				tbody.parentNode.removeChild(tbody);
+			}
+		}
+
+		// Ho definito init come una funzione asincrona, per cui l'esecuzione è slegata
+		// dal flusso sequenziale dello script. Il browser si occupa di gestire queste
+		// funzioni, che prima o poi verranno eseguite e completate.
+		window.onload = init();
+
+		async function init() {
+			showHomepage();
+			setEvents();
+		}
+
+		function setEvents() {
+			setHomepageEvents();
+			setProjectionPanelEvents();
+			setManageReservationPanelEvents();
+			setCommonEvents();
+		}
+
+		function setCommonEvents() {
+			const btns = document.getElementsByClassName("goto-homepage");
+
+			for (let i = 0; i < btns.length; i++) {
+				btns[i].addEventListener("click", showHomepage);
+			}
+		}
+
+		function setHomepageEvents() {
+			const projBtn = document.getElementById("btn-projections");
+			projBtn.addEventListener("click", showProjectionsList);
+
+			const manageReservationBtn =
+				document.getElementById("btn-manage-reservation");
+			manageReservationBtn.addEventListener("click", showManageReservation);
+		}
+
+		function setProjectionPanelEvents() {
+			const reservationForm = document.getElementById(RESERVATION_FORM_ID);
+			reservationForm.addEventListener("submit", newReservation);
+		}
+
+		function setManageReservationPanelEvents() {
+			const searchForm = document.getElementById("form-cerca-prenotazione");
+			searchForm.addEventListener("submit", searchReservation);
+
+			const deleteSeatsForm = document.getElementById("modifica-prenotazione");
+			deleteSeatsForm.addEventListener("submit", deleteReservedSeats);
+
+			const deleteForm = document.getElementById("cancella-prenotazione");
+			deleteForm.addEventListener("submit", deleteReservation);
+		}
+
+		function showHomepage() {
+			changePanel("homepage");
+		}
+
+		async function showProjectionsList() {
+			getMovieProjections().then((projections) => {
+				cleanProjectionsTable();
+				projections.forEach(addProjectionDOM);
+				changePanel("projections");
+			},
+				(error) => onError("Failed to get projections", error));
+		}
+
+		function cleanProjectionsTable() {
+			const tbody = document.getElementById("table-body-proiezioni");
+
+			if (tbody && tbody.rows && tbody.rows.length > 0) {
+				for (let i = 0; i < tbody.rows.length; i++) {
+					tbody.deleteRow(i);
+				}
+			}
+		}
+
+		function showManageReservation() {
+			cleanManageReservationPanel();
+
+			document.getElementById("div-modifica-prenotazione")
+				.style.display = "none";
+
+			changePanel("manage-reservation");
+		}
+
+		function showEditReservationSubPanel(reservation, room, projId) {
+			cleanManageReservationSubPanel();
+
+			const seatsMatrix = createSeatsMatrix([reservation], room.row,
+				room.columns);
+
+			fillSeatsTable("tabella-modifica-prenotazione", seatsMatrix,
+				newManageSeatCheckbox);
+
+			setInputValue("id-proiezione-mod", projId);
+			setInputValue("id-prenotazione-mod", reservation.id);
+
+			document.getElementById("div-modifica-prenotazione")
+				.style.display = "block";
+		}
+
+		function cleanManageReservationPanel() {
+			cleanInptValue("id-prenotazione");
+		}
+
+		function cleanManageReservationSubPanel() {
+			clearTableById("tabella-modifica-prenotazione");
+			cleanInptValue("posti-da-cancellare");
+			cleanInptValue("id-posti-da-cancellare");
+			cleanInptValue("id-proiezione-mod");
+			cleanInptValue("id-prenotazione-mod");
+		}
+
+	</script>
+</body>
 
 </html>
