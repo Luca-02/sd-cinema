@@ -1,14 +1,12 @@
 package it.unimib.finalproject.server.entities;
 
-import java.io.Serializable;
+import it.unimib.finalproject.server.Utility.DateTimeFormat;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class Proiezione implements Serializable, Comparable<Proiezione> {
-
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+public class Proiezione implements Comparable<Proiezione> {
 
     private Integer id;
     private Integer idFilm;
@@ -66,14 +64,30 @@ public class Proiezione implements Serializable, Comparable<Proiezione> {
     }
 
     public Date formattedData() throws ParseException {
-        return dateFormat.parse(getData());
+        return DateTimeFormat.dateFormat.parse(getData());
     }
 
     public Date formattedTime() throws ParseException {
-        return timeFormat.parse(getOrario());
+        return DateTimeFormat.timeFormat.parse(getOrario());
     }
 
-    public boolean proiezioneSovrapposta(List<Proiezione> proiezioni, Map<Integer, Film> filmMap) throws ParseException {
+    public boolean correctDateTimeFormat() {
+        boolean check = true;
+        try {
+            formattedData();
+            formattedTime();
+        } catch (ParseException e) {
+            check = false;
+        }
+        return check;
+    }
+
+    public boolean proiezioneSovrapposta(List<Proiezione> proiezioni, List<Film> filmList) throws ParseException {
+        Map<Integer, Film> filmMap = new HashMap<>();
+        for (var obj : filmList) {
+            filmMap.put(obj.getId(), obj);
+        }
+
         boolean check = false;
         for (var obj : proiezioni) {
             if (!Objects.equals(getId(), obj.getId()) &&

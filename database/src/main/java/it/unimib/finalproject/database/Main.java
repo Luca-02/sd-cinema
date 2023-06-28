@@ -3,12 +3,10 @@ package it.unimib.finalproject.database;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +17,7 @@ public class Main {
      * Porta di ascolto.
      */
     public static final int PORT = 3030;
+    public static final int BUFFER_SIZE = 1024;
 
     protected static ConcurrentHashMap<String, String> database = new ConcurrentHashMap<>();
 
@@ -120,7 +119,7 @@ public class Main {
     private static void read(SelectionKey key) throws IOException {
         SocketChannel clientSocket = (SocketChannel) key.channel();
 
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         StringBuilder receivedData = new StringBuilder();
 
         try {
@@ -141,6 +140,7 @@ public class Main {
         }
 
         String request = receivedData.toString();
+        buffer.clear();
 
         System.out.println("[Client: " + clientSocket.socket().getRemoteSocketAddress() +
                 ", Received: " + request +
@@ -154,7 +154,6 @@ public class Main {
         String response = (String) key.attachment();
         SocketChannel clientSocket = (SocketChannel) key.channel();
 
-        int BUFFER_SIZE = 1024;
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
         int bytesSent = 0;
@@ -171,6 +170,7 @@ public class Main {
             bytesSent += bytesToWrite;
         }
 
+        buffer.clear();
         closeClientConnection(key, clientSocket);
     }
 

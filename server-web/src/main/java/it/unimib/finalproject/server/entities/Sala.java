@@ -1,8 +1,7 @@
 package it.unimib.finalproject.server.entities;
 
-import java.io.Serializable;
 
-public class Sala implements Serializable, Comparable<Sala> {
+public class Sala implements Comparable<Sala> {
 
     private Integer id;
     private String nome;

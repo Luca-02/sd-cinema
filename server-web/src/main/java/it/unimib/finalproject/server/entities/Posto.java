@@ -1,8 +1,6 @@
 package it.unimib.finalproject.server.entities;
 
-import java.io.Serializable;
-
-public class Posto implements Serializable, Comparable<Posto> {
+public class Posto implements Comparable<Posto> {
 
     Integer id;
     Integer row;

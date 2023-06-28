@@ -4,9 +4,10 @@ it\unimib\finalproject\server\entities\Proiezione.class
 it\unimib\finalproject\server\handler\HandlerResponse.class
 it\unimib\finalproject\server\entities\Film.class
 it\unimib\finalproject\server\ClientChannel.class
+it\unimib\finalproject\server\entities\Sala.class
+it\unimib\finalproject\server\entities\Prenotazione.class
+it\unimib\finalproject\server\Utility\DateTimeFormat.class
+it\unimib\finalproject\server\entities\Posto.class
 it\unimib\finalproject\server\TestResource.class
 it\unimib\finalproject\server\CinemaResource.class
 it\unimib\finalproject\server\StringMessageBodyWriter.class
-it\unimib\finalproject\server\entities\Sala.class
-it\unimib\finalproject\server\entities\Prenotazione.class
-it\unimib\finalproject\server\entities\Posto.class

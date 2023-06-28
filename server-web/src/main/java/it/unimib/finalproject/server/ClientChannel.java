@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 
 public class ClientChannel implements Runnable {
 
+    public static final int BUFFER_SIZE = 1024;
+
     private InetSocketAddress hostAddress;
     private SocketChannel socketChannel;
     private String request;
@@ -34,7 +36,7 @@ public class ClientChannel implements Runnable {
             writeToServer(request);
             setResponse(readFromServer());
 
-            Thread.sleep((int) (100 * Math.random()));
+            Thread.sleep((int) (10 * Math.random()));
             socketChannel.close();
             System.out.println("Connection closed");
         } catch (IOException | InterruptedException e) {
@@ -43,7 +45,6 @@ public class ClientChannel implements Runnable {
     }
 
     public void writeToServer(String request) throws IOException {
-        int BUFFER_SIZE = 1024;
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
         int bytesSent = 0;
@@ -60,13 +61,15 @@ public class ClientChannel implements Runnable {
             bytesSent += bytesToWrite;
         }
 
+        buffer.clear();
+
         System.out.println("[Server: " + socketChannel.socket().getRemoteSocketAddress() +
                 ", Send: " + request +
                 ", Time: " + LocalDateTime.now() + "]");
     }
 
     public String readFromServer() throws IOException {
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         StringBuilder receivedData = new StringBuilder();
 
         while (socketChannel.read(buffer) != -1) {
@@ -81,6 +84,7 @@ public class ClientChannel implements Runnable {
 //        System.out.println("Received: ");
 //        System.out.println(receivedData.toString());
 
+        buffer.clear();
         return receivedData.toString();
     }
 

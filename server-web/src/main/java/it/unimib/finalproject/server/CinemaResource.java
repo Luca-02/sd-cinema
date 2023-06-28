@@ -12,7 +12,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 @Path("api")
 public class CinemaResource {
@@ -305,12 +306,9 @@ public class CinemaResource {
                 var filmList =
                         HandlerResponse.parseResponseFilmList(mapper, response);
 
-                Map<Integer, Film> filmMap = new HashMap<>();
-                for (var obj : filmList) {
-                    filmMap.put(obj.getId(), obj);
-                }
-
-                if (newObj.notNullAttributes() && !newObj.proiezioneSovrapposta(proiezioneList, filmMap)) {
+                if (newObj.notNullAttributes() &&
+                        newObj.correctDateTimeFormat() &&
+                        !newObj.proiezioneSovrapposta(proiezioneList, filmList)) {
                     command = "MSET proiezione:" + newId + " " + newObj;
                     response =
                             HandlerResponse.parseResponse(socketRequest(command));

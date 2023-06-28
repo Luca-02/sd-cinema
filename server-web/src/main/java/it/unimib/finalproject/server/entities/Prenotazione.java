@@ -1,9 +1,12 @@
 package it.unimib.finalproject.server.entities;
 
-import java.io.Serializable;
+import it.unimib.finalproject.server.Utility.DateTimeFormat;
+
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
-public class Prenotazione implements Serializable, Comparable<Prenotazione> {
+public class Prenotazione implements Comparable<Prenotazione> {
 
     private Integer id;
     private String data;
@@ -44,6 +47,31 @@ public class Prenotazione implements Serializable, Comparable<Prenotazione> {
 
     public void setPosti(List<Posto> posti) {
         this.posti = posti;
+    }
+
+    public Date formattedData() throws ParseException {
+        return DateTimeFormat.dateFormat.parse(getData());
+    }
+
+    public Date formattedTime() throws ParseException {
+        return DateTimeFormat.timeFormat.parse(getOrario());
+    }
+
+    public boolean correctDateTimeFormat() {
+        boolean check = true;
+        try {
+            formattedData();
+            formattedTime();
+        } catch (ParseException e) {
+            check = false;
+        }
+        return check;
+    }
+
+    public boolean notNullAttributes() {
+        return  id != null &&
+                data != null &&
+                orario != null;
     }
 
     @Override

@@ -1,8 +1,6 @@
 package it.unimib.finalproject.server.entities;
 
-import java.io.Serializable;
-
-public class Film implements Serializable, Comparable<Film> {
+public class Film implements Comparable<Film> {
 
     private Integer id;
     private String film;

@@ -11,18 +11,18 @@ public class Test {
     public static final String keyValueDelimiter = "!#!";
 
     public static void main(String[] args) throws ParseException {
-        HashMap<Integer, Film> films = new HashMap<>();
+        List<Film> films = new ArrayList<>();
         Film film = new Film();
         film.setId(0);
         film.setFilm("test1");
         film.setDurataMinuti(31);
-        films.put(0, film);
+        films.add(film);
 
         Film film1 = new Film();
         film1.setId(1);
         film1.setFilm("test2");
         film1.setDurataMinuti(26);
-        films.put(1, film1);
+        films.add(film1);
 
         Proiezione pNew = new Proiezione();
         pNew.setId(0);
@@ -41,14 +41,7 @@ public class Test {
         List<Proiezione> proiezioni = new ArrayList<>();
         proiezioni.add(p);
 
-        System.out.println(pNew.formattedTime());
-        System.out.println(p.formattedTime());
-
-        System.out.println(pNew.formattedTime().compareTo(p.formattedTime()));
-
-        System.out.println("---");
-
-        System.out.println(pNew.proiezioneSovrapposta(proiezioni, films));
+        System.out.println(pNew.correctDateTimeFormat());
 
     }
 }

@@ -6,17 +6,65 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
 
 * ### GET
 
-    **Descrizione**: Restituisce l'elenco di tutti i film.
+    - **Descrizione**: Restituisce l'elenco di tutti i film.
     
-    **Parametri**: None
+    - **Parametri**: None
     
-    **Body richiesta**: None
+    - **Body richiesta**: None
     
-    **Risposta**: Viene restituita la rappresentazione in JSON di tutti i film, un oggetto JSON con i campi `id: int`, `film: string` e `durataMinuti: int`
+    - **Risposta**: Viene restituita una lista JSON di tutti i film, nel formato
+
+          {
+            "id": [int],
+            "film": [string],
+            "durataMinuti": [int]
+          }
+
+  - **Codici di stato restituiti**:
+      * `200 OK`
+
+* ### POST
+
+  - **Descrizione**: aggiunge un film alla base di dati.
+  
+  - **Parametri**: ci deve essere l'header `Content-Type: application/json`.
+  
+  - **Body richiesta**: rappresentazione in formato JSON del film del tipo
+
+        {
+          "film": [string],
+          "durataMinuti": [int]
+        }
+
+    il parametro `id` sarà generato automaticamente dal server che lo renderà unico.
     
-    **Codici di stato restituiti**:
-    
-    * 200 OK
+  - **Risposta**: in caso di successo il body è vuoto e la risorsa creata è indicata nell'header `Location`.
+  
+  - **Codici di stato restituiti**:
+    * `201 Created`
+    * `400 Bad Request`: c'è un errore del client, il formato JSON errato, c'è un campo errato o mancante.
+
+## `/api/film/{id}`
+
+* ### GET
+
+  - **Descrizione**: restituisce il film con l'`id` fornito.
+  
+  - **Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo del film da restituire.
+  
+  - **Body richiesta**: None
+  
+  - **Risposta**: In caso di successo viene restituita la rappresentazione in JSON del film, nel formato
+  
+        {
+          "id": [int],
+          "film": [string],
+          "durataMinuti": [int]
+        }
+
+  - **Codici di stato restituiti**:
+    * `200 OK`
+    * `404 Not Found`: film non trovato.
 
 ---
 
