@@ -70,7 +70,7 @@
 		</div>
 	</div>
 	<script>
-		const API_URI = "http://localhost:8080/test/api";
+		const API_URI = "http://localhost:8080/api";
 
 		const PANEL_IDS = ["homepage", "projections", "reservations",
 			"manage-reservation"];
@@ -176,7 +176,6 @@
 			const roomObj = await getRoomById(projId);
 
 			showEditReservationSubPanel(reservationObj, roomObj, projId);
-			//return {"reservation": reservationObj, "room": roomObj};
 		}
 
 
@@ -381,7 +380,7 @@
 		}
 
 		function createSeatsMatrix(reservations, rows, cols) {
-			const seats = initSeatsMatrix(30, 6); //TODO sostituire con rows e cols
+			const seats = initSeatsMatrix(rows, cols);
 			setReservedSeatsToMatrix(seats, reservations);
 
 			return seats;
