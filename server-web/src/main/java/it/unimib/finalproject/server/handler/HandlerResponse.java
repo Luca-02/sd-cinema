@@ -138,6 +138,7 @@ public class HandlerResponse {
         Map<Integer, Posto> postiMap = new HashMap<>();
         if (!Objects.equals(responseString[0], emptyResponseMessage)) {
             for (String str : responseString) {
+            	System.out.println(str);
                 String[] arr = str.split(keyValueDelimiter);
                 Posto pos = mapper.readValue(arr[1], Posto.class);
                 postiMap.put(pos.getId(), pos);

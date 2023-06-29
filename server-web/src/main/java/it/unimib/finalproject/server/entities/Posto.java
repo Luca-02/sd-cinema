@@ -1,12 +1,12 @@
 package it.unimib.finalproject.server.entities;
 
-public class Posto implements Comparable<Posto> {
-
-    Integer id;
+public class Posto implements Comparable<Posto>, IEntity {
+	
+	Integer id;
     Integer row;
     Integer column;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 

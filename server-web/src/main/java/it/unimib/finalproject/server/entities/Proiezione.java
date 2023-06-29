@@ -4,16 +4,16 @@ import it.unimib.finalproject.server.utility.DateTimeFormat;
 import java.text.ParseException;
 import java.util.*;
 
-public class Proiezione implements Comparable<Proiezione> {
+public class Proiezione implements Comparable<Proiezione>, IEntity {
 
-    private Integer id;
+	private Integer id;
     private Integer idFilm;
     private Integer idSala;
     private String data;
     private String orario;
     private List<Prenotazione> prenotazioni;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -130,7 +130,7 @@ public class Proiezione implements Comparable<Proiezione> {
 
     @Override
     public int compareTo(Proiezione o) {
-        return id.compareTo(o.getId());
+        return data.compareTo(o.getData());
     }
 
     @Override

@@ -1,9 +1,9 @@
 package it.unimib.finalproject.server.entities;
 
 
-public class Sala implements Comparable<Sala> {
+public class Sala implements Comparable<Sala>, IEntity {
 
-    private Integer id;
+	private Integer id;
     private String nome;
     private Integer row;
     private Integer columns;

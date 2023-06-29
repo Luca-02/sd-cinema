@@ -42,7 +42,7 @@ function newReserveButtonCell(row, projId, callback) {
     newButtonCell(row, button);
 }
 
-async function showProjectionsList(projections, reserveCb) {
+function showProjectionsList(projections, reserveCb) {
     try {
 
         cleanProjectionsTable();
@@ -59,10 +59,11 @@ async function showProjectionsList(projections, reserveCb) {
 
 function cleanProjectionsTable() {
     const tbody = document.getElementById("table-body-proiezioni");
-
+    
     if (tbody && tbody.rows && tbody.rows.length > 0) {
-        for (let i = 0; i < tbody.rows.length; i++) {
-            tbody.deleteRow(i);
+        let rowCount = tbody.rows.length;
+        for (var x = rowCount - 1; x >= 0; x--) {
+            tbody.deleteRow(x);
         }
     }
 }

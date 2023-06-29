@@ -1,15 +1,16 @@
 package it.unimib.finalproject.server.entities;
 
-public class Film implements Comparable<Film> {
+public class Film implements Comparable<Film>, IEntity{
 
-    private Integer id;
-    private String film;
+	private Integer id;
+	private String film;
     private Integer durataMinuti;
 
-    public int getId() {
-        return id;
-    }
 
+	public int getId() {
+		return this.id;
+	}
+	
     public void setId(int id) {
         this.id = id;
     }

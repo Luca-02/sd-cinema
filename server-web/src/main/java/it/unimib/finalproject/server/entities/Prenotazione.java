@@ -6,9 +6,9 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
-public class Prenotazione implements Comparable<Prenotazione> {
+public class Prenotazione implements Comparable<Prenotazione>, IEntity {
 
-    private Integer id;
+	private Integer id;
     private String data;
     private String orario;
     private List<Posto> posti;
