@@ -6,7 +6,7 @@ prenotazione di posti di proiezioni cinematografiche in un cinema.
 ## Componenti del gruppo
 
 * Luca Milanesi (886279) <l.milanesi7@campus.unimib.it>
-* // dati...
+* Luca Garavaglia (885917) <l.garavaglia13@campus.unimib.it>
 
 ## Compilazione ed esecuzione
 
