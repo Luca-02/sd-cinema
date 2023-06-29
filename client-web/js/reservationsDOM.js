@@ -2,7 +2,6 @@ const SEATS_TABLE_ID = "seleziona-posti";
 const SEATS_INPUT_ID = "posti";
 const RESERVATION_FORM_ID = "form-prenotazione";
 
-
 function extractReservationObj() {
     const seatsList = extractSeatsList();
 
@@ -65,4 +64,8 @@ function newSeatCheckbox(row, col, seatObj) {
 function setReservationPanelEvents(newReservationCb) {
     const reservationForm = document.getElementById(RESERVATION_FORM_ID);
     reservationForm.addEventListener("submit", newReservationCb);
+}
+
+function getProjIdForNewReservation(){
+    return document.getElementById("id-proiezione").value;
 }

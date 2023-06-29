@@ -53,6 +53,7 @@ async function getProjectionReservationsWithRoom(projId) {
         const room = await getRoomById(projId);
 
         return { "reservations": reservations, "room": room, "projId": projId };
+        
     } catch (error) {
         onError("Failed to retrive reservations", error);
     }
@@ -64,25 +65,24 @@ async function searchReservation(event) {
     let projId = 0; //TODO 
     let reservationId = document.getElementById("id-prenotazione").value;
 
-    let reservationObj = await getReservation(projId, reservationId);
+    try{
+        let reservationObj = await getReservation(projId, reservationId);
 
-    //aggiungo info sulla sala
-    const roomObj = await getRoomById(projId);
-
-    showEditReservationSubPanel(reservationObj, roomObj, projId);
+        //aggiungo info sulla sala
+        const roomObj = await getRoomById(projId);
+    
+        showEditReservationSubPanel(reservationObj, roomObj, projId);
+    } catch (error) {
+        onError("Failed to search the reservation", error);
+    }
 }
 
 async function deleteReservedSeats(event) {
     event.preventDefault();
-    let reservationId = document.
-        getElementById("id-prenotazione-mod").value;
 
-    let projectionId = document.
-        getElementById("id-proiezione-mod").value;
-
-    let seats = document.getElementById("id-posti-da-cancellare").value;
-    const seatsToDelete = seats.split(';');
-    seatsToDelete.pop();
+    let reservationId = getReservationIdToModify();
+    let projectionId = getMREditProjId();
+    let seatsToDelete = getSeatsIdToDelete();
 
     try {
         deleteSeats(projectionId, reservationId, seatsToDelete);
@@ -102,9 +102,7 @@ async function newReservation(event) {
     event.preventDefault();
 
     // Recuperi i dati da inviare dal form.
-    const projectionInpt = document.getElementById("id-proiezione");
-    let projId = projectionInpt.value;
-
+    const projId = getProjIdForNewReservation();
     let reservationObj = extractReservationObj();
 
     try {

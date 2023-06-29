@@ -1,3 +1,8 @@
+const PROJ_MANAGE_INPT_ID = "id-proiezione-mod";
+const RESERVATION_MANAGE_INPT_ID = "id-prenotazione-mod";
+const SEATSID_TO_DELETE_INPT_ID = "id-posti-da-cancellare";
+const SEATS_TO_DELETE_INPT_ID = "posti-da-cancellare";
+
 function newManageSeatCheckbox(row, col, seatObj) {
     let checkbox = newSeatCheckboxInpt(row, col);
 
@@ -12,15 +17,31 @@ function newManageSeatCheckbox(row, col, seatObj) {
 
     checkbox.addEventListener('change', function () {
         if (this.checked) {
-            removeSeatFromInput(this.value, "posti-da-cancellare");
-            removeSeatFromInput(seatObj.id, "id-posti-da-cancellare");
+            removeSeatFromInput(this.value, SEATS_TO_DELETE_INPT_ID);
+            removeSeatFromInput(seatObj.id, SEATSID_TO_DELETE_INPT_ID);
         }
         else {
-            appendToInputValue(this.value + ';', "posti-da-cancellare");
-            appendToInputValue(seatObj.id + ';', "id-posti-da-cancellare");
+            appendToInputValue(this.value + ';', SEATS_TO_DELETE_INPT_ID);
+            appendToInputValue(seatObj.id + ';', SEATSID_TO_DELETE_INPT_ID);
         }
     });
     return checkbox;
+}
+
+function getSeatsIdToDelete() {
+    let seats = document.getElementById(SEATSID_TO_DELETE_INPT_ID).value;
+    const seatsToDelete = seats.split(';');
+    seatsToDelete.pop();
+
+    return seatsToDelete;
+}
+
+function getReservationIdToModify() {
+    return document.getElementById(RESERVATION_MANAGE_INPT_ID).value;
+}
+
+function getMREditProjId() {
+    return document.getElementById(PROJ_MANAGE_INPT_ID).value;
 }
 
 function showManageReservation() {
@@ -41,8 +62,8 @@ function showEditReservationSubPanel(reservation, room, projId) {
     fillSeatsTable("tabella-modifica-prenotazione", seatsMatrix,
         newManageSeatCheckbox);
 
-    setInputValue("id-proiezione-mod", projId);
-    setInputValue("id-prenotazione-mod", reservation.id);
+    setInputValue(PROJ_MANAGE_INPT_ID, projId);
+    setInputValue(RESERVATION_MANAGE_INPT_ID, reservation.id);
 
     document.getElementById("div-modifica-prenotazione")
         .style.display = "block";
@@ -54,10 +75,10 @@ function cleanManageReservationPanel() {
 
 function cleanManageReservationSubPanel() {
     clearTableById("tabella-modifica-prenotazione");
-    cleanInptValue("posti-da-cancellare");
-    cleanInptValue("id-posti-da-cancellare");
-    cleanInptValue("id-proiezione-mod");
-    cleanInptValue("id-prenotazione-mod");
+    cleanInptValue(SEATS_TO_DELETE_INPT_ID);
+    cleanInptValue(SEATSID_TO_DELETE_INPT_ID);
+    cleanInptValue(PROJ_MANAGE_INPT_ID);
+    cleanInptValue(RESERVATION_MANAGE_INPT_ID);
 }
 
 function setManageReservationPanelEvents(searchCb, deleteSeatsCb, deleteCb) {

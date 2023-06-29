@@ -43,13 +43,18 @@ function newReserveButtonCell(row, projId, callback) {
 }
 
 async function showProjectionsList(projections, reserveCb) {
-    cleanProjectionsTable();
+    try {
 
-    for(let projection of projections){
-        addProjectionDOM(projection, reserveCb);
+        cleanProjectionsTable();
+
+        for (let projection of projections) {
+            addProjectionDOM(projection, reserveCb);
+        }
+
+        changePanel("projections", PANEL_IDS);
+    } catch (error) {
+        onError("Failed to prepare the DOM for the projection list", error);
     }
-
-    changePanel("projections", PANEL_IDS);
 }
 
 function cleanProjectionsTable() {
