@@ -31,7 +31,7 @@ sul database sul rispettivo host e porta.
 ## Server (database)
 
 La **socket** del server posto nel database rimarrà in ascolto sull'**host** `localhost` e sulla **porta** 3030 per soddisfare le richieste
-che richiedono i client client.
+che richiedono i client.
 
 - La risposta del server è una stringa che varierà in base al comando da eseguire richiesto dal client.
 
