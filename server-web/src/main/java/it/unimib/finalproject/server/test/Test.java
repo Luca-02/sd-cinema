@@ -1,47 +1,42 @@
-package it.unimib.finalproject.server.Test;
+package it.unimib.finalproject.server.test;
 
-import it.unimib.finalproject.server.entities.Film;
-import it.unimib.finalproject.server.entities.Proiezione;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Test {
-    public static final String excapeDelimiter = "\r\n!#!\r\n";
-    public static final String keyValueDelimiter = "!#!";
 
     public static void main(String[] args) throws ParseException {
-        List<Film> films = new ArrayList<>();
-        Film film = new Film();
-        film.setId(0);
-        film.setFilm("test1");
-        film.setDurataMinuti(31);
-        films.add(film);
+        try {
+            // create object mapper instance
+            ObjectMapper mapper = new ObjectMapper();
 
-        Film film1 = new Film();
-        film1.setId(1);
-        film1.setFilm("test2");
-        film1.setDurataMinuti(26);
-        films.add(film1);
+            File path = Paths.get("database.json").toFile();
 
-        Proiezione pNew = new Proiezione();
-        pNew.setId(0);
-        pNew.setIdFilm(0);
-        pNew.setIdSala(9);
-        pNew.setData("2020-10-10");
-        pNew.setOrario("21:00");
+            // convert JSON file to map
+            Map<String, String> map = mapper.readValue(path, Map.class);
 
-        Proiezione p = new Proiezione();
-        p.setId(1);
-        p.setIdFilm(1);
-        p.setIdSala(9);
-        p.setData("2020-10-10");
-        p.setOrario("20:00");
+            // print map entries
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                System.out.println(entry.getKey() + " - " + entry.getValue());
+            }
 
-        List<Proiezione> proiezioni = new ArrayList<>();
-        proiezioni.add(p);
+            System.out.println(map.size());
 
-        System.out.println(pNew.correctDateTimeFormat());
-
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

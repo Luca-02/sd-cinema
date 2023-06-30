@@ -45,14 +45,14 @@ public class TestResource {
         Sala s = new Sala();
         s.setId(0);
         s.setNome("a");
-        s.setRow(2);
+        s.setRows(2);
         s.setColumns(3);
         saleMapTest.put(s.getId(), s);
 
         s = new Sala();
         s.setId(1);
         s.setNome("b");
-        s.setRow(2);
+        s.setRows(2);
         s.setColumns(3);
         saleMapTest.put(s.getId(), s);
 

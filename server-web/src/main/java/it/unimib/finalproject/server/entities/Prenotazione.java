@@ -3,26 +3,35 @@ package it.unimib.finalproject.server.entities;
 import it.unimib.finalproject.server.utility.DateTimeFormat;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
 public class Prenotazione implements Comparable<Prenotazione>, IEntity {
 
 	private Integer id;
+    private Integer idProiezione;
     private String data;
     private String orario;
     private List<Posto> posti;
 
-    public int getId() {
+    @Override
+    public Integer getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getIdProiezione() {
+        return idProiezione;
+    }
+
+    public void setIdProiezione(Integer idProiezione) {
+        this.idProiezione = idProiezione;
     }
 
     public String getData() {
@@ -57,6 +66,16 @@ public class Prenotazione implements Comparable<Prenotazione>, IEntity {
         return DateTimeFormat.timeFormat.parse(getOrario());
     }
 
+    public void initCurrentDateTime() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DateTimeFormat.dateFormatString);
+        data = currentDate.format(formatter);
+
+        LocalTime currentTime = LocalTime.now();
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern(DateTimeFormat.timeFormatString);
+        orario = currentTime.format(formatter1);
+    }
+
     public boolean correctDateTimeFormat() {
         boolean check = true;
         try {
@@ -68,6 +87,7 @@ public class Prenotazione implements Comparable<Prenotazione>, IEntity {
         return check;
     }
 
+    @Override
     public boolean notNullAttributes() {
         return  id != null &&
                 data != null &&
@@ -82,6 +102,7 @@ public class Prenotazione implements Comparable<Prenotazione>, IEntity {
     @Override
     public String toString() {
         return "{\"id\": " + id +
+                ", \"idProiezione\": " + idProiezione +
                 ", \"data\": \"" + data + "\"" +
                 ", \"orario\": \"" + orario + "\"}";
     }

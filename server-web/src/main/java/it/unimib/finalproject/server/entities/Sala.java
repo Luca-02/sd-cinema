@@ -5,14 +5,15 @@ public class Sala implements Comparable<Sala>, IEntity {
 
 	private Integer id;
     private String nome;
-    private Integer row;
+    private Integer rows;
     private Integer columns;
 
-    public int getId() {
+    @Override
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -24,12 +25,12 @@ public class Sala implements Comparable<Sala>, IEntity {
         this.nome = nome;
     }
 
-    public Integer getRow() {
-        return row;
+    public Integer getRows() {
+        return rows;
     }
 
-    public void setRow(Integer row) {
-        this.row = row;
+    public void setRows(Integer rows) {
+        this.rows = rows;
     }
 
     public Integer getColumns() {
@@ -45,10 +46,11 @@ public class Sala implements Comparable<Sala>, IEntity {
         return id.compareTo(o.getId());
     }
 
+    @Override
     public boolean notNullAttributes() {
         return  id != null &&
                 nome != null &&
-                row != null &&
+                rows != null &&
                 columns != null;
     }
 
@@ -56,7 +58,7 @@ public class Sala implements Comparable<Sala>, IEntity {
     public String toString() {
         return "{\"id\": " + id +
                 ", \"nome\": \"" + nome + "\"" +
-                ", \"row\": " + row +
+                ", \"rows\": " + rows +
                 ", \"columns\": " + columns + "}";
     }
 

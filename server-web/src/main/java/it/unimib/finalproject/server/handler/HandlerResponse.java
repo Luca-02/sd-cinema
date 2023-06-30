@@ -23,10 +23,7 @@ public class HandlerResponse {
     }
 
     public static boolean responseIsTrue(String[] responseString) {
-        if (Objects.equals(responseString[0], trueResponseMessage))
-            return true;
-        else
-            return false;
+        return Objects.equals(responseString[0], trueResponseMessage);
     }
 
     public static String[] parseResponse(String responseString) {
@@ -59,46 +56,14 @@ public class HandlerResponse {
 
     /* - */
 
+    public static Proiezione parseResponseProiezione(ObjectMapper mapper, String[] responseString)
+            throws JsonProcessingException {
+        return parseObjectResponse(mapper, responseString, Proiezione.class);
+    }
+
     public static List<Proiezione> parseResponseProiezioneList(ObjectMapper mapper, String[] responseString)
             throws JsonProcessingException {
-        Map<Integer, Proiezione> proiezioniMap = new HashMap<>();
-        Map<Integer, Prenotazione> prenotazioniMap = new HashMap<>();
-        Map<Integer, Posto> postiMap = new HashMap<>();
-        Map<Integer, Integer> prenotazioniProiezioni = new HashMap<>();
-        Map<Integer, Integer> postiPrenotazioni = new HashMap<>();
-        if (!Objects.equals(responseString[0], emptyResponseMessage)) {
-            for (String str : responseString) {
-                String[] arr = str.split(keyValueDelimiter);
-                try {
-                    Posto pos = mapper.readValue(arr[1], Posto.class);
-                    Integer idPrenotazione = getIdFromKey(arr[0], 3);
-                    postiMap.put(pos.getId(), pos);
-                    postiPrenotazioni.put(pos.getId(), idPrenotazione);
-                } catch (JsonProcessingException e1) {
-                    try {
-                        Prenotazione pre = mapper.readValue(arr[1], Prenotazione.class);
-                        pre.setPosti(new ArrayList<>());
-                        Integer idProiezione = getIdFromKey(arr[0], 1);
-                        prenotazioniMap.put(pre.getId(), pre);
-                        prenotazioniProiezioni.put(pre.getId(), idProiezione);
-                    } catch (JsonProcessingException e2) {
-                        Proiezione pro = mapper.readValue(arr[1], Proiezione.class);
-                        pro.setPrenotazioni(new ArrayList<>());
-                        proiezioniMap.put(pro.getId(), pro);
-                    }
-                }
-            }
-        }
-
-        for (var entry : postiPrenotazioni.entrySet()) {
-            prenotazioniMap.get(entry.getValue()).getPosti().add(postiMap.get(entry.getKey()));
-        }
-
-        for (var entry : prenotazioniProiezioni.entrySet()) {
-            proiezioniMap.get(entry.getValue()).getPrenotazioni().add(prenotazioniMap.get(entry.getKey()));
-        }
-
-        return new ArrayList<>(proiezioniMap.values());
+        return parseSingleListResponse(mapper, responseString, Proiezione.class);
     }
 
     /* - */
@@ -106,16 +71,22 @@ public class HandlerResponse {
     public static List<Prenotazione> parseResponsePrenotazioneList(ObjectMapper mapper, String[] responseString)
             throws JsonProcessingException {
         Map<Integer, Prenotazione> prenotazioniMap = new HashMap<>();
-        Map<Integer, Posto> postiMap = new HashMap<>();
-        Map<Integer, Integer> postiPrenotazioni = new HashMap<>();
+        Map<Integer, List<Posto>> prenotazionePosti = new HashMap<>();
         if (!Objects.equals(responseString[0], emptyResponseMessage)) {
             for (String str : responseString) {
                 String[] arr = str.split(keyValueDelimiter);
                 try {
                     Posto pos = mapper.readValue(arr[1], Posto.class);
-                    Integer idPrenotazione = getIdFromKey(arr[0], 3);
-                    postiMap.put(pos.getId(), pos);
-                    postiPrenotazioni.put(pos.getId(), idPrenotazione);
+                    Integer idPrenotazione = getIdFromKey(arr[0], 1);
+
+                    if (prenotazionePosti.get(idPrenotazione) == null) {
+                        List<Posto> postoList = new ArrayList<>();
+                        postoList.add(pos);
+                        prenotazionePosti.put(idPrenotazione, postoList);
+                    }
+                    else {
+                        prenotazionePosti.get(idPrenotazione).add(pos);
+                    }
                 } catch (JsonProcessingException e1) {
                     Prenotazione pre = mapper.readValue(arr[1], Prenotazione.class);
                     pre.setPosti(new ArrayList<>());
@@ -124,8 +95,8 @@ public class HandlerResponse {
             }
         }
 
-        for (var entry : postiPrenotazioni.entrySet()) {
-            prenotazioniMap.get(entry.getValue()).getPosti().add(postiMap.get(entry.getKey()));
+        for (var entry : prenotazionePosti.entrySet()) {
+            prenotazioniMap.get(entry.getKey()).getPosti().addAll(entry.getValue());
         }
 
         return new ArrayList<>(prenotazioniMap.values());
@@ -138,7 +109,6 @@ public class HandlerResponse {
         Map<Integer, Posto> postiMap = new HashMap<>();
         if (!Objects.equals(responseString[0], emptyResponseMessage)) {
             for (String str : responseString) {
-            	System.out.println(str);
                 String[] arr = str.split(keyValueDelimiter);
                 Posto pos = mapper.readValue(arr[1], Posto.class);
                 postiMap.put(pos.getId(), pos);

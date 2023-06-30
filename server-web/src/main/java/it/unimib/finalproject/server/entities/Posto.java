@@ -1,12 +1,15 @@
 package it.unimib.finalproject.server.entities;
 
+import java.util.Objects;
+
 public class Posto implements Comparable<Posto>, IEntity {
 	
 	Integer id;
     Integer row;
     Integer column;
 
-    public int getId() {
+    @Override
+    public Integer getId() {
         return id;
     }
 
@@ -28,6 +31,20 @@ public class Posto implements Comparable<Posto>, IEntity {
 
     public void setColumn(Integer column) {
         this.column = column;
+    }
+
+    @Override
+    public boolean notNullAttributes() {
+        return row != null &&
+                column != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Posto)) return false;
+        Posto posto = (Posto) o;
+        return Objects.equals(getRow(), posto.getRow()) && Objects.equals(getColumn(), posto.getColumn());
     }
 
     @Override

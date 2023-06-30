@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.unimib.finalproject.server.entities.*;
+import it.unimib.finalproject.server.handler.HandlerRequest;
 import it.unimib.finalproject.server.handler.HandlerResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -24,217 +25,8 @@ public class CinemaResource {
     /**
      * Porta di connessione per il database
      */
+    public static final String HOSTNAME = "localhost";
     public static final int PORT = 3030;
-
-    /* - */
-
-    private static ObjectMapper mapper = new ObjectMapper();
-
-    private <T extends IEntity> int generateNewId(List<T> entities) {
-    	int newId = 0;
-        if (entities.size() > 0) {
-        	
-        	int maxId = 0;
-        	
-        	for(T entity: entities) {
-        		int id = entity.getId();
-        		if (id >= maxId)
-        			maxId = id;
-        	}
-        	
-        	newId = maxId + 1;
-        }
-        return newId;
-    }
-    
-    private String[] sendDbRequest(String command)
-    		throws InterruptedException, IOException{
-        String response = socketRequest(command);
-        String[] parsedResponse = HandlerResponse.parseResponse(response);
-        
-        return parsedResponse;
-    }
-
-    private List<Film> dbGetAllFilm()
-    		throws InterruptedException, IOException{
-        String command = "MSGETALL film:";
-        String[] response = sendDbRequest(command);
-        List<Film> films = HandlerResponse.parseResponseFilmList(mapper, response);
-
-        Collections.sort(films);
-
-        return films;
-    }
-
-    private Film dbGetFilmById(int id)
-    		throws InterruptedException, IOException{
-        String command = "MGET film:" + id;
-
-        String[] response = sendDbRequest(command);
-        return HandlerResponse.parseResponseFilm(mapper, response);
-    }
-
-    private Sala dbGetSalaById(int id)
-    		throws InterruptedException, IOException{
-        String command = "MGET sala:" + id;
-
-        String[] response = sendDbRequest(command);
-        Sala sala = HandlerResponse.parseResponseSala(mapper, response);
-
-        return sala;
-    }
-
-    private List<Proiezione> dbGetAllProiezioni() 
-    		throws InterruptedException, IOException{
-        String command = "MSGETALL proiezione:";
-
-        String[] response = sendDbRequest(command);
-        List<Proiezione> proiezioni = HandlerResponse.parseResponseProiezioneList(mapper, response);
-
-        Collections.sort(proiezioni);
-
-        return proiezioni;
-    }
-
-    private Proiezione dbGetProiezioneById(int idProiezione) 
-    		throws InterruptedException, IOException{
-        String command = "MSGETALL proiezione:" + idProiezione;
-
-        String[] response = sendDbRequest(command);
-        List<Proiezione> proiezione = HandlerResponse.parseResponseProiezioneList(mapper, response);
-
-        if (proiezione.size() != 0){
-            return proiezione.get(0);
-        }
-        else{
-            return null;
-        }
-    }
-
-    private List<Prenotazione> dbGetPrenotazioniByProiezione(int idProiezione)
-    		throws InterruptedException, IOException{
-        String command = "MSGETALL proiezione:" + idProiezione + ":prenotazione:";
-
-        String[] response = sendDbRequest(command);
-        List<Prenotazione> prenotazioni = HandlerResponse.parseResponsePrenotazioneList(mapper, response);
-
-        Collections.sort(prenotazioni);
-        return prenotazioni;
-    }
-
-    private Prenotazione dbGetPrenotazione(int idProiezione, int idPrenotazione) 
-    		throws InterruptedException, IOException{
-        String command = "MSGETALL proiezione:" + idProiezione + ":prenotazione:" + idPrenotazione;
-
-        String[] response = sendDbRequest(command);
-        List<Prenotazione> prenotazione = HandlerResponse.parseResponsePrenotazioneList(mapper, response);
-
-        if (prenotazione.size() != 0){
-            return prenotazione.get(0);
-        }
-        else{
-            return null;
-        }
-    }
-
-    private List<Posto> dbGetPostiPrenotati(int idProiezione, int idPrenotazione) 
-    		throws InterruptedException, IOException{
-        String command = "MSGETALL proiezione:" + idProiezione + ":prenotazione:" + idPrenotazione + ":posto:";
-
-        String[] response = sendDbRequest(command);
-        List<Posto> posti = HandlerResponse.parseResponsePostoList(mapper, response);
-
-        Collections.sort(posti);
-        return posti;
-    }
-    
-    private List<Posto> dbGetPostiPrenotati(int idProiezione) 
-    		throws InterruptedException, IOException {
-    	
-    	Proiezione proiezione = dbGetProiezioneById(idProiezione);
-    	List<Prenotazione> prenotazioni = proiezione.getPrenotazioni();
-    	List<Posto> postiPrenotati = new ArrayList<Posto>();
-    	
-    	for(Prenotazione p : prenotazioni) {
-    		postiPrenotati.addAll(p.getPosti());
-    	}
-        return postiPrenotati;
-    }
-    
-    private List<Posto> dbGetAllPosti()
-		throws InterruptedException, IOException{
-	        String command = "MSGETALL posto:";
-
-	        String[] response = sendDbRequest(command);
-	        List<Posto> posti = HandlerResponse.parseResponsePostoList(mapper, response);
-
-	        Collections.sort(posti);
-
-	        return posti;   	
-    }
-    
-    private boolean dbCreatePrenotazione(int idProiezione, Prenotazione prenotazione)
-    		throws InterruptedException, IOException {
-    	//TODO: manca la gestione della transazione, non ci basta il tempo credo
-    	//es. se va in errore la insert di un posto dovrei annullare tutte le insert precedenti.
-    	
-    	
-    	//TODO: ci sarebbe da verificare se i posti sono nella sala?
-    	if(!postiDisponibili(idProiezione, prenotazione))
-    		return false;
-    	
-        String command = "MSET proiezione:" + idProiezione +
-        		":prenotazione:" + prenotazione.getId() + " " + prenotazione;
-        
-        String[] response = sendDbRequest(command);
-        
-        if (!HandlerResponse.responseIsOk(response)) return false;
-        
-        List<Posto> postiPrenotazione = prenotazione.getPosti();
-      
-        List<Posto> postiTotali = dbGetAllPosti();
-    	int newId = generateNewId(postiTotali);
-
-        for(Posto posto: postiPrenotazione) {
-        	posto.setId(newId);
-        	
-            command = "MSET proiezione:" + idProiezione + ":prenotazione:" + prenotazione.getId() +
-            		":posto:" + posto.getId() + " " + posto;
-            
-            response = sendDbRequest(command);
-            
-            if(!HandlerResponse.responseIsOk(response))
-            	return false;
-            
-            newId++;
-        }
-        return true;
-    }
-    
-    private boolean postiDisponibili(int idProiezione, Prenotazione prenotazione)
-    		throws InterruptedException, IOException {
-    	List<Posto> postiPrenotati = dbGetPostiPrenotati(idProiezione);
-    	List<Posto> postiDaAggiungere = prenotazione.getPosti();
- 
-    	
-    	for(Posto p : postiPrenotati) {
-    		for(Posto pNew : postiDaAggiungere) {
-    			if (pNew.getRow() == p.getRow() &&
-    				pNew.getColumn() == p.getColumn())
-    				return false;
-    		}
-    	}
-    	return true;
-    }
-
-    public String socketRequest(String request)
-            throws InterruptedException, IOException {
-        ClientChannel clientChannel = new ClientChannel("localhost", PORT, request);
-        Thread thread = new Thread(clientChannel);
-        thread.start();
-        thread.join();
-        return clientChannel.getResponse();
-    }
 
     /* - Film - */
 
@@ -242,61 +34,25 @@ public class CinemaResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFilm() {
-        try {
-            List<Film> films = dbGetAllFilm(); 
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
 
-            return Response.ok(films).build();
+        try {
+            List<Film> filmList = hr.dbGetAllFilm();
+            Collections.sort(filmList);
+
+            return Response.ok(filmList).build();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return Response.serverError().build();
         }
     }
+
 /*
     @Path("/film")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addFilm(String body) {
-        try {
-            String[] response;
-            int newId;
-            boolean isSet = false;
-
-            synchronized (this) {
-                List<Film> films = dbGetAllFilm(); 
-
-                if (films.size() == 0)
-                    newId = 0;
-                else
-                    newId = films.get(films.size() - 1).getId() + 1;
-
-                var newObj = mapper.readValue(body, Film.class);
-                newObj.setId(newId);
-
-                if (newObj.notNullAttributes()) {
-                    String command = "MSET film:" + newId + " " + newObj;
-                    response =
-                            HandlerResponse.parseResponse(socketRequest(command));
-                    isSet = true;
-                }
-            }
-
-            if (!isSet)
-                return Response.status(Response.Status.BAD_REQUEST).build();
-
-            if (HandlerResponse.responseIsOk(response)) {
-                var uri = new URI("api/film/" + newId);
-                return Response.created(uri).build();
-            } else {
-                return Response.serverError().build();
-            }
-        } catch (JsonParseException | JsonMappingException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        } catch (IOException | URISyntaxException | InterruptedException e) {
-            e.printStackTrace();
-            return Response.serverError().build();
-        }
     }
 */
     
@@ -304,8 +60,10 @@ public class CinemaResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFilm(@PathParam("id") int idFilm) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
         try {
-            Film film = dbGetFilmById(idFilm);
+            Film film = hr.dbGetFilmById(idFilm);
 
             if (film != null)
                 return Response.ok(film).build();
@@ -318,79 +76,30 @@ public class CinemaResource {
     }
 
     /* - Sala - */
-/*
+
     @Path("/sala")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSala() {
-        String command = "MSGETALL sala:";
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
 
         try {
-            String[] response =
-                    HandlerResponse.parseResponse(socketRequest(command));
-            var objectList =
-                    HandlerResponse.parseResponseSalaList(mapper, response);
+            List<Sala> salaList = hr.dbGetAllSala();
+            Collections.sort(salaList);
 
-            Collections.sort(objectList);
-
-            return Response.ok(objectList).build();
+            return Response.ok(salaList).build();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return Response.serverError().build();
         }
     }
 
+/*
     @Path("/sala")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addSala(String body) {
-        try {
-            String[] response;
-            int newId;
-            boolean isSet = false;
-
-            String command = "MSGETALL sala:";
-
-            synchronized (this) {
-                response = HandlerResponse.parseResponse(socketRequest(command));
-                var objectList =
-                        HandlerResponse.parseResponseSalaList(mapper, response);
-
-                Collections.sort(objectList);
-
-                if (objectList.size() == 0)
-                    newId = 0;
-                else
-                    newId = objectList.get(objectList.size() - 1).getId() + 1;
-
-                var newObj = mapper.readValue(body, Sala.class);
-                newObj.setId(newId);
-
-                if (newObj.notNullAttributes()) {
-                    command = "MSET sala:" + newId + " " + newObj;
-                    response =
-                            HandlerResponse.parseResponse(socketRequest(command));
-                    isSet = true;
-                }
-            }
-
-            if (!isSet)
-                return Response.status(Response.Status.BAD_REQUEST).build();
-
-            if (HandlerResponse.responseIsOk(response)) {
-                var uri = new URI("api/sala/" + newId);
-                return Response.created(uri).build();
-            } else {
-                return Response.serverError().build();
-            }
-        } catch (JsonParseException | JsonMappingException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        } catch (IOException | URISyntaxException | InterruptedException e) {
-            e.printStackTrace();
-            return Response.serverError().build();
-        }
     }
 */
     
@@ -398,8 +107,10 @@ public class CinemaResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSala(@PathParam("id") int idSala) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
         try {
-            Sala sala = dbGetSalaById(idSala);
+            Sala sala = hr.dbGetSalaById(idSala);
 
             if (sala != null)
                 return Response.ok(sala).build();
@@ -417,98 +128,36 @@ public class CinemaResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProiezione() {
-        try {
-            List<Proiezione> proiezioni = dbGetAllProiezioni();
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
 
-            return Response.ok(proiezioni).build();
+        try {
+            List<Proiezione> proiezioneList = hr.dbGetAllProiezione();
+            Collections.sort(proiezioneList);
+
+            return Response.ok(proiezioneList).build();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return Response.serverError().build();
         }
     }
+
 /*
     @Path("/proiezione")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addProiezione(String body) {
-        try {
-            String[] response;
-            int newId;
-            boolean isSet = false;
-
-            String command = "MSGETALL proiezione:";
-
-            synchronized (this) {
-                response = HandlerResponse.parseResponse(socketRequest(command));
-                var proiezioneList =
-                        HandlerResponse.parseResponseProiezioneList(mapper, response);
-
-                Collections.sort(proiezioneList);
-
-                if (proiezioneList.size() == 0)
-                    newId = 0;
-                else
-                    newId = proiezioneList.get(proiezioneList.size() - 1).getId() + 1;
-
-                var newObj = mapper.readValue(body, Proiezione.class);
-                newObj.setId(newId);
-                newObj.setPrenotazioni(new ArrayList<>());
-
-                command = "MEXISTS film:" + newObj.getIdFilm();
-                response =
-                        HandlerResponse.parseResponse(socketRequest(command));
-                if (!HandlerResponse.responseIsTrue(response)) {
-                    return Response.status(Response.Status.NOT_FOUND).build();
-                }
-
-                command = "MEXISTS sala:" + newObj.getIdSala();
-                response =
-                        HandlerResponse.parseResponse(socketRequest(command));
-                if (!HandlerResponse.responseIsTrue(response)) {
-                    return Response.status(Response.Status.NOT_FOUND).build();
-                }
-
-                command = "MSGETALL film:";
-                response =
-                        HandlerResponse.parseResponse(socketRequest(command));
-                var filmList =
-                        HandlerResponse.parseResponseFilmList(mapper, response);
-
-                if (newObj.notNullAttributes() &&
-                        newObj.correctDateTimeFormat() &&
-                        !newObj.proiezioneSovrapposta(proiezioneList, filmList)) {
-                    command = "MSET proiezione:" + newId + " " + newObj;
-                    response =
-                            HandlerResponse.parseResponse(socketRequest(command));
-                    isSet = true;
-                }
-            }
-
-            if (!isSet)
-                return Response.status(Response.Status.BAD_REQUEST).build();
-
-            if (HandlerResponse.responseIsOk(response)) {
-                var uri = new URI("api/proiezione/" + newId);
-                return Response.created(uri).build();
-            } else {
-                return Response.serverError().build();
-            }
-        } catch (JsonParseException | JsonMappingException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        } catch (IOException | URISyntaxException | InterruptedException | ParseException e) {
-            e.printStackTrace();
-            return Response.serverError().build();
-        }
     }
 */
+
     @Path("/proiezione/{id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProiezione(@PathParam("id") int idProiezione) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
         try {
-            Proiezione proiezione = dbGetProiezioneById(idProiezione);
+            Proiezione proiezione = hr.dbGetProiezioneById(idProiezione);
 
             if (proiezione != null)
                 return Response.ok(proiezione).build();
@@ -522,50 +171,46 @@ public class CinemaResource {
 
     /* - */
 
-    @Path("/proiezione/{id}/prenotazione")
+    @Path("/prenotazione")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPrenotazione(@PathParam("id") int idProiezione) {
-        try {
-        	if(dbGetProiezioneById(idProiezione) == null)
-                return Response.status(Response.Status.NOT_FOUND).build();
-        	
-            List<Prenotazione> prenotazioni = dbGetPrenotazioniByProiezione(idProiezione);
+    public Response getPrenotazione(@QueryParam("idProiezione") String idProiezioneStr) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
 
-            return Response.ok(prenotazioni).build();
+        try {
+            List<Prenotazione> prenotazioneList = hr.dbGetAllPrenotazione();
+
+            if (idProiezioneStr != null) {
+                int idProiezione = Integer.parseInt(idProiezioneStr);
+                prenotazioneList = hr.dbGetAllPrenotazioneByProiezione(prenotazioneList, idProiezione);
+            }
+            Collections.sort(prenotazioneList);
+
+            return Response.ok(prenotazioneList).build();
+        } catch (NumberFormatException e) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return Response.serverError().build();
         }
     }
 
-    @Path("/proiezione/{id}/prenotazione")
+    @Path("/prenotazione")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addPrenotazione(@PathParam("id") int idProiezione,
-                                    String body) {
+    public Response addPrenotazione(String body) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
         try {
+            Prenotazione prenotazione = hr.parseEntity(body, Prenotazione.class);
+            Response responseCode;
+
             synchronized (this) {
-            	
-            	if(dbGetProiezioneById(idProiezione) == null)
-                    return Response.status(Response.Status.NOT_FOUND).build();
-            	
-            	
-            	List<Prenotazione> prenotazioni = dbGetPrenotazioniByProiezione(idProiezione);
-            	int newId = generateNewId(prenotazioni);
-            	
-                Prenotazione prenotazione = mapper.readValue(body, Prenotazione.class);
-                prenotazione.setId(newId);
-                
-                if(dbCreatePrenotazione(idProiezione, prenotazione)) {
-                    URI uri = new URI("api/proiezione/" + idProiezione + "/prenotazione/" + newId);
-                    return Response.created(uri).build();
-                }
-                else {
-                    return Response.serverError().build();
-                }
+                responseCode = hr.dbAddPrenotazione(prenotazione);
             }
+
+            return responseCode;
         } catch (JsonParseException | JsonMappingException e) {
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -575,13 +220,14 @@ public class CinemaResource {
         }
     }
 
-    @Path("/proiezione/{id}/prenotazione/{id2}")
+    @Path("/prenotazione/{id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPrenotazione(@PathParam("id") int idProiezione,
-                                    @PathParam("id2") int idPrenotazione) {
+    public Response getPrenotazione(@PathParam("id") int idPrenotazione) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
         try {
-            Prenotazione prenotazione = dbGetPrenotazione(idProiezione, idPrenotazione);
+            Prenotazione prenotazione = hr.dbGetPrenotazioneById(idPrenotazione);
 
             if (prenotazione != null)
                 return Response.ok(prenotazione).build();
@@ -593,28 +239,40 @@ public class CinemaResource {
         }
     }
 
-    @Path("/proiezione/{id}/prenotazione/{id2}")
+    @Path("/prenotazione/{id}")
     @DELETE
-    public Response deletePrenotazione(@PathParam("id") int idProiezione,
-                                       @PathParam("id2") int idPrenotazione) {
-    	return null;
-    }
+    public Response deletePrenotazione(@PathParam("id") int idPrenotazione) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
 
-    /* - */
-
-    @Path("/proiezione/{id}/prenotazione/{id2}/posto")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getPosto(@PathParam("id") int idProiezione,
-                             @PathParam("id2") int idPrenotazione) {
         try {
-            List<Posto> posti = dbGetPostiPrenotati(idProiezione, idPrenotazione);
-
-            return Response.ok(posti).build();
+            boolean check = hr.dbDeletePrenotazione(idPrenotazione);
+            if (check)
+                return Response.noContent().build();
+            else
+                return Response.status(Response.Status.NOT_FOUND).build();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return Response.serverError().build();
         }
+    }
+
+    /* - */
+
+    @Path("prenotazione/{id}/posto")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPosto(@PathParam("id") int idPrenotazione) {
+//        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT, mapper);
+//
+//        try {
+//            List<Posto> posti = hr.dbGetPostiPrenotati(idProiezione, idPrenotazione);
+//
+//            return Response.ok(posti).build();
+//        } catch (IOException | InterruptedException e) {
+//            e.printStackTrace();
+//            return Response.serverError().build();
+//        }
+        return null;
     }
 
     @Path("/proiezione/{id}/prenotazione/{id2}/posto/{id3}")

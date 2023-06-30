@@ -6,12 +6,12 @@ public class Film implements Comparable<Film>, IEntity{
 	private String film;
     private Integer durataMinuti;
 
-
-	public int getId() {
+    @Override
+	public Integer getId() {
 		return this.id;
 	}
 	
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -31,6 +31,7 @@ public class Film implements Comparable<Film>, IEntity{
         this.durataMinuti = durataMinuti;
     }
 
+    @Override
     public boolean notNullAttributes() {
         return  id != null &&
                 film != null &&

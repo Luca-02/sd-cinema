@@ -11,9 +11,9 @@ public class Proiezione implements Comparable<Proiezione>, IEntity {
     private Integer idSala;
     private String data;
     private String orario;
-    private List<Prenotazione> prenotazioni;
 
-    public int getId() {
+    @Override
+    public Integer getId() {
         return id;
     }
 
@@ -53,14 +53,6 @@ public class Proiezione implements Comparable<Proiezione>, IEntity {
         this.orario = orario;
     }
 
-    public List<Prenotazione> getPrenotazioni() {
-        return prenotazioni;
-    }
-
-    public void setPrenotazioni(List<Prenotazione> prenotazioni) {
-        this.prenotazioni = prenotazioni;
-    }
-
     public Date formattedData() throws ParseException {
         return DateTimeFormat.dateFormat.parse(getData());
     }
@@ -80,7 +72,7 @@ public class Proiezione implements Comparable<Proiezione>, IEntity {
         return check;
     }
 
-    public boolean proiezioneSovrapposta(List<Proiezione> proiezioni, List<Film> filmList) throws ParseException {
+    public boolean overlapProiezione(List<Proiezione> proiezioni, List<Film> filmList) throws ParseException {
         Map<Integer, Film> filmMap = new HashMap<>();
         for (var obj : filmList) {
             filmMap.put(obj.getId(), obj);
@@ -120,6 +112,7 @@ public class Proiezione implements Comparable<Proiezione>, IEntity {
         return check;
     }
 
+    @Override
     public boolean notNullAttributes() {
         return  id != null &&
                 idFilm != null &&

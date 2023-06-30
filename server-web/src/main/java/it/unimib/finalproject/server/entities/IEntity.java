@@ -1,6 +1,7 @@
 package it.unimib.finalproject.server.entities;
 
 public interface IEntity {
-	public int getId();
-	public String toString();
+	Integer getId();
+	boolean notNullAttributes();
+	String toString();
 }

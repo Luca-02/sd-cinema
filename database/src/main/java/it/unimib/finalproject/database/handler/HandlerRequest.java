@@ -15,6 +15,7 @@ public class HandlerRequest {
     public static final String okResponseMessage = "OK";
     public static final String trueResponseMessage = "(true)";
     public static final String falseResponseMessage = "(false)";
+    public static final String errorResponseMessage = "(false)";
 
     public static String handle(String request) {
         String[] split_request = request.split(" ", 2);
@@ -34,10 +35,14 @@ public class HandlerRequest {
             case "MSET":
                 response = handleMSET(parameters);
                 break;
+            case "MDEL":
+                response = handleMDEL(parameters);
+                break;
             case "MEXISTS":
                 response = handleMEXISTS(parameters);
                 break;
             default:
+                response = errorResponseMessage;
                 break;
         }
 
@@ -68,6 +73,13 @@ public class HandlerRequest {
         String value = split_parameters[1].trim();
         Main.database.put(key, value);
         return okResponseMessage;
+    }
+
+    public static String handleMDEL(String parameters) {
+        if (Main.database.remove(parameters) != null)
+            return trueResponseMessage;
+        else
+            return falseResponseMessage;
     }
 
     public static String handleMEXISTS(String parameters) {
