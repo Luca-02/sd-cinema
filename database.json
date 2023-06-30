@@ -16,6 +16,8 @@
   "proiezione:2": "{\"id\": 2, \"idFilm\": 3, \"idSala\": 3, \"data\": \"2024-02-03\", \"orario\": \"21:00\"}",
   "proiezione:3": "{\"id\": 3, \"idFilm\": 1, \"idSala\": 4, \"data\": \"2024-08-25\", \"orario\": \"21:00\"}",
   "proiezione:4": "{\"id\": 4, \"idFilm\": 4, \"idSala\": 2, \"data\": \"2016-11-04\", \"orario\": \"21:00\"}",
+  "proiezione:5": "{\"id\": 5, \"idFilm\": 0, \"idSala\": 0, \"data\": \"2026-05-18\", \"orario\": \"15:00\"}",
+  "proiezione:6": "{\"id\": 6, \"idFilm\": 0, \"idSala\": 3, \"data\": \"2026-05-18\", \"orario\": \"21:00\"}",
 
   "prenotazione:0": "{\"id\": 0, \"idProiezione\": 0, \"data\": \"2023-09-10\", \"orario\": \"20:00\"}",
   "prenotazione:1": "{\"id\": 1, \"idProiezione\": 0, \"data\": \"2023-10-10\", \"orario\": \"21:00\"}",
