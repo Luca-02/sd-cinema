@@ -121,10 +121,15 @@ async function searchReservation(event) {
 async function deleteReservedSeats(event) {
     event.preventDefault();
 
-    let reservationId = getReservationIdToModify();
-    let seatsToDelete = getSeatsIdToDelete();
-
     try {
+        let reservationId = getReservationIdToModify();
+        let seatsToDelete = getSeatsIdToDelete();
+
+        if(seatsToDelete.length == 0){
+            throw new Error("you can't delete 0 seats!\n" +
+                "Please select atleast a seat to delete");
+        }
+
         await deleteSeats(reservationId, seatsToDelete);
         alert("Seats removed successfully!");
         showHomepage();
