@@ -208,7 +208,7 @@ public class HandlerRequest {
         if (proiezione.notNullAttributes() &&
                 proiezione.correctDateTimeFormat()) {
 
-            if (!proiezione.overlapProiezione(proiezioneList, dbGetAllFilm()))
+            if (proiezione.overlapProiezione(proiezioneList, dbGetAllFilm()))
                 return Response.status(Response.Status.CONFLICT).build();
 
             command = "MSET proiezione:" + proiezione.getId() + " " + proiezione;
