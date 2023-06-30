@@ -2,21 +2,16 @@ package it.unimib.finalproject.server;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.unimib.finalproject.server.entities.*;
 import it.unimib.finalproject.server.handler.HandlerRequest;
-import it.unimib.finalproject.server.handler.HandlerResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.*;
-import it.unimib.finalproject.server.entities.*;
 
 
 @Path("api")

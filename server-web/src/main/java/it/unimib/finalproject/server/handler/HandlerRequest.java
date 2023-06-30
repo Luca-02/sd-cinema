@@ -177,6 +177,7 @@ public class HandlerRequest {
 
     public Response dbAddProiezione(Proiezione proiezione)
             throws IOException, InterruptedException, URISyntaxException {
+        // TODO: fare in modo che non siano accavallate
         String command;
         String[] response;
 
@@ -278,7 +279,7 @@ public class HandlerRequest {
 
     public boolean dbDeletePrenotazione(int id)
             throws IOException, InterruptedException {
-        String command = "MDEL prenotazione:" + id;
+        String command = "MSDEL prenotazione:" + id;
 
         String[] response = sendDbRequest(command);
         return HandlerResponse.responseIsTrue(response);

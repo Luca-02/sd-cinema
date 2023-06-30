@@ -14,11 +14,14 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
     
     - **Risposta**: Viene restituita una lista JSON di tutti i film, nel formato
 
-          {
-            "id": [int],
-            "film": [string],
-            "durataMinuti": [int]
-          }
+          [
+            {
+              "id": [int],
+              "film": [string],
+              "durataMinuti": [int]
+            },
+            ...
+          ]
 
   - **Codici di stato restituiti**:
       * `200 OK`
@@ -66,55 +69,247 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
     * `200 OK`
     * `404 Not Found`: film non trovato.
 
----
+## `/api/sala`
 
-## `/contacts`
+* ### GET
 
-Ogni risorsa ha la sua sezione. In questo caso la risorsa da documentare è quella dei contatti.
+    - **Descrizione**: Restituisce l'elenco di tutte le sale.
 
-### GET
+    - **Parametri**: None
 
-**Descrizione**: una breve descrizione di cosa fa il metodo applicato alla risorsa. In questo caso restituisce l'elenco dei contatti salvati.
+    - **Body richiesta**: None
 
-**Parametri**: un elenco dei parametri se previsti, sia nel percorso (esempio `/contacts/{id}`) che nella richiesta (esempio `/contacts?id={id}`) o anche negli header. In questo caso non sono previsti.
+    - **Risposta**: Viene restituita una lista JSON di tute le sale, nel formato
 
-**Body richiesta**: cosa ci deve essere nel body della richiesta. In questo caso nulla perché è una GET.
+          [
+              {
+                  "id": [int],
+                  "nome": [string],
+                  "rows": [int],
+                  "columns": [int]
+              },
+            ...
+          ]
 
-**Risposta**: cosa viene restituito in caso di successo. In questo caso viene restituito la rappresentazione in JSON del contatto, un oggetto JSON con i campi `id` (un intero), `name` e `number` (due stringhe).
+    - **Codici di stato restituiti**:
+        * `200 OK`
 
-**Codici di stato restituiti**: elenco dei codici di stato, se necessario dettagliare e non elencare quelli già previsti da Jackarta in automatico. In questo caso c'è solo lo stato `200 OK` da segnalare:
+* ### POST
 
-* 200 OK
+    - **Descrizione**: aggiunge una sala alla base di dati.
 
-### POST
+    - **Parametri**: ci deve essere l'header `Content-Type: application/json`.
 
-**Descrizione**: aggiunge un contatto alla rubrica telefonica.
+    - **Body richiesta**: rappresentazione in formato JSON della sala del tipo
 
-**Parametri**: ci deve essere l'header `Content-Type: application/json`.
+          {
+              "nome": [string],
+              "rows": [int],
+              "columns": [int]
+          }
 
-**Body richiesta**: rappresentazione in formato JSON del contatto con i campi `name` e `number` che sono due stringhe.
+      il parametro `id` sarà generato automaticamente dal server che lo renderà unico.
 
-**Risposta**: in caso di successo il body è vuoto e la risorsa creata è indicata nell'header `Location`.
+    - **Risposta**: in caso di successo il body è vuoto e la risorsa creata è indicata nell'header `Location`.
 
-**Codici di stato restituiti**:
+    - **Codici di stato restituiti**:
+        * `201 Created`
+        * `400 Bad Request`: c'è un errore del client, il formato JSON errato, c'è un campo errato o mancante.
 
-* 201 Created
-* 400 Bad Request: c'è un errore del client (JSON, campo mancante o altro).
+## `/api/sala/{id}`
 
-## `/contacts/{id}`
+* ### GET
 
-### GET
+    - **Descrizione**: restituisce la sala con l'`id` fornito.
 
-**Descrizione**: restituisce il contatto con l'id fornito.
+    - **Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo della sala da restituire.
 
-**Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo del contatto da restituire.
+    - **Body richiesta**: None
 
-**Body richiesta**: vuoto.
+  - **Risposta**: In caso di successo viene restituita la rappresentazione in JSON della sala, nel formato
 
-**Risposta**: In caso di successo la rappresentazione in JSON del contatto, un oggetto JSON con i campi `id` (un intero), `name` e `number` (due stringhe).
+        {
+            "id": [int],
+            "nome": [string],
+            "rows": [int],
+            "columns": [int]
+        }
 
-**Codici di stato restituiti**:
+  - **Codici di stato restituiti**:
+      * `200 OK`
+      * `404 Not Found`: sala non trovata.
 
-* 200 OK
-* 400 Bad Request: c'è un errore del client (ID non valido).
-* 404 Not Found: contatto non trovato.
+## `/api/proiezione`
+
+* ### GET
+
+    - **Descrizione**: Restituisce l'elenco di tutte le proiezioni.
+
+    - **Parametri**: None
+
+    - **Body richiesta**: None
+
+    - **Risposta**: Viene restituita una lista JSON di tute le proiezioni, nel formato
+
+          [
+              {
+                  "id": [int],
+                  "idFilm": [int],
+                  "idSala": [int],
+                  "data": [string],
+                  "orario": [string]
+              },
+            ...
+          ]
+
+    - **Codici di stato restituiti**:
+        * `200 OK`
+
+* ### POST
+
+    - **Descrizione**: aggiunge una proiezione alla base di dati.
+
+    - **Parametri**: ci deve essere l'header `Content-Type: application/json`.
+
+  - **Body richiesta**: rappresentazione in formato JSON della proiezione del tipo
+
+        {
+            "idFilm": [int],
+            "idSala": [int],
+            "data": [string],
+            "orario": [string]
+        }
+
+    il parametro `id` sarà generato automaticamente dal server che lo renderà unico.
+
+  - **Risposta**: in caso di successo il body è vuoto e la risorsa creata è indicata nell'header `Location`.
+
+  - **Codici di stato restituiti**:
+      * `201 Created`
+      * `400 Bad Request`: c'è un errore del client, il formato JSON errato, c'è un campo errato o mancante.
+
+## `/api/proiezione/{id}`
+
+* ### GET
+
+    - **Descrizione**: restituisce la proiezione con l'`id` fornito.
+
+    - **Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo della proiezione da restituire.
+
+    - **Body richiesta**: None
+
+    - **Risposta**: In caso di successo viene restituita la rappresentazione in JSON della proiezione, nel formato
+
+          {
+              "id": [int],
+              "idFilm": [int],
+              "idSala": [int],
+              "data": [string],
+              "orario": [string]
+          }
+
+    - **Codici di stato restituiti**:
+        * `200 OK`
+        * `404 Not Found`: proiezione non trovata.
+
+## `/api/prenotazione?idProiezione={id}`
+
+* ### GET
+
+    - **Descrizione**: Restituisce l'elenco di tutte le prenotazioni.
+
+    - **Parametri**: se viene specificato nella query della richiesta il valore di `idProiezione` dato da `{id}` 
+  che rappresenta un identificativo della proieizone, allora verrà restituito l'elenco di tutte le prenotazioni 
+  che hanno `idProiezione = {id}`, altrimenti se la query non è specificata verrà restituito l'elenco di tutte le 
+  prenotazioni.
+
+    - **Body richiesta**: None
+
+    - **Risposta**: Viene restituita una lista JSON di tute le prenotazioni, nel formato
+
+          [
+              {
+                  "id": [int],
+                  "idProiezione": [int],
+                  "data": [string],
+                  "orario": [string],
+                  "posti": [
+                      {
+                          "id": [int],
+                          "row": [int],
+                          "column": [int]
+                      },
+                      ...
+                  ]
+              },
+            ...
+          ]
+
+    - **Codici di stato restituiti**:
+        * `200 OK`
+
+* ### POST
+
+    - **Descrizione**: aggiunge una proiezione (e i posti annessi) alla base di dati.
+
+    - **Parametri**: ci deve essere l'header `Content-Type: application/json`.
+
+    - **Body richiesta**: rappresentazione in formato JSON della proiezione del tipo
+
+          {
+              "idProiezione": [int],
+              "posti": [
+                  {
+                      "row": [int],
+                      "column": [int]
+                  },
+                  ...
+              ]
+          }
+
+        il parametro `id` delle prenotazioni e dei posti sarà generato automaticamente dal server che lo renderà unico.
+    I parametri `data` e `orario` saranno inizializzati automaticamente alla data e ora attuali nel momento della 
+    richiesta 
+
+    - **Risposta**: in caso di successo il body è vuoto e la risorsa creata è indicata nell'header `Location`.
+
+    - **Codici di stato restituiti**:
+        * `201 Created`
+        * `400 Bad Request`: c'è un errore del client, il formato JSON errato, c'è un campo errato o mancante oppure 
+      i posti specificati nella prenotazione non sono validi o sono già prenotati.
+        * `404 Not Found`: `idProiezione` specificato nella richiesta non è correlato a nessuna proiezione esistente.
+
+## `/api/prenotazione/{id}`
+
+* ### GET
+
+    - **Descrizione**: restituisce la prenotazione con l'`id` fornito.
+
+    - **Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo della prenotazione da restituire.
+
+    - **Body richiesta**: None
+
+    - **Risposta**: In caso di successo viene restituita la rappresentazione in JSON della prenotazione, nel formato
+
+          {
+              "id": [int],
+              "idProiezione": [int],
+              "data": [string],
+              "orario": [string],
+              "posti": [
+                  {
+                      "id": [int],
+                      "row": [int],
+                      "column": [int]
+                  },
+                  ...
+              ]
+          }
+
+      - **Codici di stato restituiti**:
+          * `200 OK`
+          * `404 Not Found`: prenotazione non trovata.
+
+## `/api/prenotazione/{id}/posto`
+
+## `/api/prenotazione/{id1}/posto/{id2}`

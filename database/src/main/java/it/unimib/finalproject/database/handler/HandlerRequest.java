@@ -38,6 +38,9 @@ public class HandlerRequest {
             case "MDEL":
                 response = handleMDEL(parameters);
                 break;
+            case "MSDEL":
+                response = handleMSDEL(parameters);
+                break;
             case "MEXISTS":
                 response = handleMEXISTS(parameters);
                 break;
@@ -80,6 +83,17 @@ public class HandlerRequest {
             return trueResponseMessage;
         else
             return falseResponseMessage;
+    }
+
+    public static String handleMSDEL(String parameters) {
+        for (Map.Entry<String, String> entry : Main.database.entrySet()) {
+            if (entry.getKey().contains(parameters)) {
+                String check = Main.database.remove(entry.getKey());
+                if (check == null)
+                    return falseResponseMessage;
+            }
+        }
+        return trueResponseMessage;
     }
 
     public static String handleMEXISTS(String parameters) {
