@@ -42,7 +42,6 @@ public class CinemaResource {
         }
     }
 
-
     @Path("/film")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
