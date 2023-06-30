@@ -5,14 +5,14 @@ function createSeatsMatrix(reservations, rows, cols) {
     return seats;
 }
 
-//array di oggetti {"id": null, "status": 0}
+//array di oggetti {"id": null, "status": 0, "reservationId": null}
 function initSeatsMatrix(rows, cols) {
     const seats = [];
 
     for (let i = 0; i < rows; i++) {
         seats[i] = [];
         for (let j = 0; j < cols; j++) {
-            seats[i][j] = { "id": null, "status": 0 };
+            seats[i][j] = { "id": null, "status": 0, "reservationId": null };
         }
     }
 
@@ -28,13 +28,14 @@ function setReservedSeatsToMatrix(seats, reservations) {
             let seatObj = seats[posto.row][posto.column];
             seatObj.status = 1;
             seatObj.id = posto.id;
+            seatObj.reservatonId = reservations[i].id;
         }
     }
 }
 
 //createCheckboxAction: funzione che ha la logica di come creare la checkbox.
 //deve avere 3 parametri: row, column e seatObj.
-//seatObj: {"id": null, "status": 0}
+//seatObj: {"id": null, "status": 0, "reservationId": null}
 function fillSeatsTable(tableId, seats, createCheckboxCb) {
     const table = document.getElementById(tableId);
     const thead = table.createTHead();

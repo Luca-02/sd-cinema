@@ -59,8 +59,6 @@ async function deleteRequest(endpoint) {
     if (!response.ok)
         throw new Error(`Response from "${endpoint}" was not successful:
         ${response.status} ${response.statusText}`);
-
-    //TODO: che faccio?
 }
 
 function changePanel(divName, panel_ids) {
@@ -100,4 +98,24 @@ function newHeaderTextCell(row, text) {
     row.appendChild(th);
 
     return th;
+}
+
+function stringToDate(str) {
+    //YYYY-MM-DD
+    let splittedStr = str.split('-');
+    return new Date(splittedStr[0], splittedStr[1] - 1, splittedStr[2]);
+}
+
+function timeGreaterThan(time1, time2){
+    //HH:MM
+    timeObj1 = time1.split(':');
+    timeObj2 = time2.split(':');
+
+    if(timeObj1[0] > timeObj2[0]) return true;
+
+    if(timeObj1[0] == timeObj2[0] &&
+        timeObj1[1] > timeObj2[1])
+        return true;
+
+    return false;
 }

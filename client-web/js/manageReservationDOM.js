@@ -56,7 +56,7 @@ function showManageReservation() {
 function showEditReservationSubPanel(reservation, room, projId) {
     cleanManageReservationSubPanel();
 
-    const seatsMatrix = createSeatsMatrix([reservation], room.row,
+    const seatsMatrix = createSeatsMatrix([reservation], room.rows,
         room.columns);
 
     fillSeatsTable("tabella-modifica-prenotazione", seatsMatrix,

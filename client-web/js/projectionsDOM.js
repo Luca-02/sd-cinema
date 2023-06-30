@@ -1,17 +1,13 @@
 function addProjectionDOM(projection, reserveCb) {
     const tbody = document.getElementById("table-body-proiezioni");
     const row = tbody.insertRow();
-
-    // Aggiunta dell'id del film
-    //newTextCell(row, projection["idFilm"]);
-
+    let movie = projection["film"];
     // Aggiunta del film
-    projection["Film"] = "placeholder"; //TODO
-    newTextCell(row, projection["Film"]);
+
+    newTextCell(row, movie["film"]);
 
     // Aggiunta della trama.
-    projection["TramaFilm"] = "blablablblablabl"; //TODO
-    newTextCell(row, projection["TramaFilm"]);
+    newTextCell(row, movie["durataMinuti"]);
 
     //Aggiunta della sala.
     newTextCell(row, projection["idSala"]);
@@ -23,18 +19,18 @@ function addProjectionDOM(projection, reserveCb) {
     newTextCell(row, projection["orario"]);
 
     //Aggiunta action Prenota
-    newReserveButtonCell(row, projection["id"], reserveCb);
+    newReserveButtonCell(row, projection["id"], projection["idSala"], reserveCb);
 }
 
 //callback ha come parametro projectionId
 //ritorna l'oggetto {"reservations": [..], "room": room, "projId": id }
-function newReserveButtonCell(row, projId, callback) {
+function newReserveButtonCell(row, projId, roomId, callback) {
     const button = document.createElement("button");
     const btnText = document.createTextNode("Prenota");
     button.appendChild(btnText);
 
     button.addEventListener("click", () => {
-        callback(projId).then((res) => {
+        callback(projId, roomId).then((res) => {
             showReservationPanel(res["reservations"], res["room"], projId);
 
         }, (error) => onError("failed to retrive reservations info", error))
@@ -42,12 +38,12 @@ function newReserveButtonCell(row, projId, callback) {
     newButtonCell(row, button);
 }
 
-function showProjectionsList(projections, reserveCb) {
+function showProjectionsList(projectionsWithMovie, reserveCb) {
     try {
 
         cleanProjectionsTable();
 
-        for (let projection of projections) {
+        for (let projection of projectionsWithMovie) {
             addProjectionDOM(projection, reserveCb);
         }
 

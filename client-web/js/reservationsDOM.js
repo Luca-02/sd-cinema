@@ -27,7 +27,7 @@ function extractSeatsList() {
 }
 
 function showReservationPanel(reservationsObj, room, projId) {
-    const seatsMatrix = createSeatsMatrix(reservationsObj, room.row,
+    const seatsMatrix = createSeatsMatrix(reservationsObj, room.rows,
         room.columns);
 
     cleanReservationPanel();

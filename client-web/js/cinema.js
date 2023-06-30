@@ -10,13 +10,29 @@ async function getProjections() {
     return await response.json();
 }
 
-async function getProjectionReservations(projectionId) {
-    const endpoint = `${API_URI}/proiezione/${projectionId}/prenotazione`;
+async function getMovie(id) {
+    const endpoint = `${API_URI}/film/${id}`;
+    const response = await getRequest(endpoint);
+    return await response.json();
+}
 
+async function getMovies() {
+    const endpoint = `${API_URI}/film`;
+    const response = await getRequest(endpoint);
+    return await response.json();
+}
+
+async function getProjectionById(id) {
+    const endpoint = `${API_URI}/proiezione/${id}`;
+    const response = await getRequest(endpoint);
+    return await response.json();
+}
+
+async function getProjectionReservations(projectionId) {
+    const endpoint = `${API_URI}/prenotazione?idProiezione=${projectionId}`;
     const response = await getRequest(endpoint);
 
     const jsonResponse = await response.json();
-
     return jsonResponse;
 }
 
@@ -27,33 +43,56 @@ async function getRoomById(roomId) {
     return await response.json();
 }
 
-async function getReservation(projId, reservationId) {
-    const endpoint = `${API_URI}/proiezione/${projId}/prenotazione/
-				${reservationId}`;
+async function getReservation(reservationId) {
+    const endpoint = `${API_URI}/prenotazione/${reservationId}`;
 
     const response = await getRequest(endpoint);
 
     return await response.json();
 }
 
-async function deleteSeats(projId, reservationId, seatsArr) {
+async function deleteSeats(reservationId, seatsArr) {
     for (let i = 0; i < seatsArr.length; i++) {
         let seatId = seatsArr[i];
 
-        let endpoint = `${API_URI}/proiezione/${projId}/prenotazione/
+        let endpoint = `${API_URI}/prenotazione/
 				${reservationId}/posto/${seatId}`;
 
         await deleteRequest(endpoint);
     }
 }
 
-async function getProjectionReservationsWithRoom(projId) {
+async function getProjectionReservationsWithRoom(projId, roomId) {
     try {
         let reservations = await getProjectionReservations(projId);
-        const room = await getRoomById(projId);
+
+        const room = await getRoomById(roomId);
 
         return { "reservations": reservations, "room": room, "projId": projId };
-        
+
+    } catch (error) {
+        onError("Failed to retrive reservations", error);
+    }
+}
+
+async function getProjectionsWithMovie() {
+    try {
+        let result = [];
+        let today = new Date();
+        let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes();
+
+        let projs = await getProjections();
+
+        for (let i = 0; i < projs.length; i++) {
+            let proj = projs[i];
+
+            if (isFutureProjection(date, time, proj)) {
+                proj["film"] = await getMovie(proj["idFilm"]);
+                result.push(proj);
+            }
+        }
+        return result;
     } catch (error) {
         onError("Failed to retrive reservations", error);
     }
@@ -62,15 +101,16 @@ async function getProjectionReservationsWithRoom(projId) {
 async function searchReservation(event) {
     event.preventDefault();
 
-    let projId = 0; //TODO 
     let reservationId = document.getElementById("id-prenotazione").value;
 
-    try{
-        let reservationObj = await getReservation(projId, reservationId);
+    try {
+        let reservationObj = await getReservation(reservationId);
+        let projId = reservationObj["idProiezione"];
+        let projObj = await getProjectionById(projId);
 
         //aggiungo info sulla sala
-        const roomObj = await getRoomById(projId);
-    
+        const roomObj = await getRoomById(projObj["idSala"]);
+
         showEditReservationSubPanel(reservationObj, roomObj, projId);
     } catch (error) {
         onError("Failed to search the reservation", error);
@@ -81,11 +121,10 @@ async function deleteReservedSeats(event) {
     event.preventDefault();
 
     let reservationId = getReservationIdToModify();
-    let projectionId = getMREditProjId();
     let seatsToDelete = getSeatsIdToDelete();
 
     try {
-        deleteSeats(projectionId, reservationId, seatsToDelete);
+        await deleteSeats(reservationId, seatsToDelete);
         alert("Seats removed successfully!");
         await searchReservation(event);
     } catch (error) {
@@ -95,6 +134,19 @@ async function deleteReservedSeats(event) {
 
 async function deleteReservation(event) {
     event.preventDefault();
+
+    let reservationId = getReservationIdToModify();
+
+    try {
+        const endpoint = `${API_URI}/prenotazione/${reservationId}`;
+        await deleteRequest(endpoint);
+
+        let successMsg = "The reservation has been deleted successfully.";
+        alert(successMsg);
+        showHomepage();
+    } catch (error) {
+        onError("Failed to delete the reservation", error);
+    }
 }
 
 async function newReservation(event) {
@@ -102,14 +154,14 @@ async function newReservation(event) {
     event.preventDefault();
 
     // Recuperi i dati da inviare dal form.
-    const projId = getProjIdForNewReservation();
     let reservationObj = extractReservationObj();
+    reservationObj["idProiezione"] = getProjIdForNewReservation();
 
     try {
         // Creo il nuovo oggetto e lo invio al server, restituisce il
         // nuovo ID.
 
-        const endpoint = `${API_URI}/proiezione/${projId}/prenotazione`;
+        const endpoint = `${API_URI}/prenotazione`;
         reservationObj["id"] = await postRequest(endpoint, reservationObj);
 
         let successMsg = "The reservation has been made successfully.\n" +
@@ -120,14 +172,14 @@ async function newReservation(event) {
         alert(successMsg);
         showHomepage();
     } catch (error) {
-        onError("Failed to perform the reservation", error);
+        onError("Failed to create the reservation", error);
     }
 }
 
 function setEvents() {
     setHomepageEvents();
     setReservationPanelEvents(newReservation);
-    
+
     setManageReservationPanelEvents(searchReservation, deleteReservedSeats,
         deleteReservation);
 
@@ -146,8 +198,8 @@ function setHomepageEvents() {
     const projBtn = document.getElementById("btn-projections");
 
     projBtn.addEventListener("click", () => {
-        getProjections().then((projections) => {
-            showProjectionsList(projections, getProjectionReservationsWithRoom);
+        getProjectionsWithMovie().then((projectionsWithMovie) => {
+            showProjectionsList(projectionsWithMovie, getProjectionReservationsWithRoom);
         },
             (error) => onError("Failed to get projections", error));
     });
@@ -160,3 +212,19 @@ function setHomepageEvents() {
 function showHomepage() {
     changePanel("homepage", PANEL_IDS);
 }
+
+function isFutureProjection(currentDate, currentTime, proj) {
+    let parsedDate = stringToDate(proj["data"]);
+    currentDate = stringToDate(currentDate);
+    let projTime = proj["orario"];
+
+    if (parsedDate > currentDate) return true;
+
+    if (parsedDate == currentDate &&
+        timeGreaterThan(projTime, currentTime))
+        return true;
+
+    return false;
+}
+
+
