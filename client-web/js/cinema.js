@@ -107,11 +107,12 @@ async function searchReservation(event) {
         let reservationObj = await getReservation(reservationId);
         let projId = reservationObj["idProiezione"];
         let projObj = await getProjectionById(projId);
+        let movieObj = await getMovie(projObj["idFilm"]);
 
         //aggiungo info sulla sala
         const roomObj = await getRoomById(projObj["idSala"]);
 
-        showEditReservationSubPanel(reservationObj, roomObj, projId);
+        showEditReservationSubPanel(reservationObj, roomObj, projObj, movieObj);
     } catch (error) {
         onError("Failed to search the reservation", error);
     }
@@ -126,7 +127,7 @@ async function deleteReservedSeats(event) {
     try {
         await deleteSeats(reservationId, seatsToDelete);
         alert("Seats removed successfully!");
-        await searchReservation(event);
+        showHomepage();
     } catch (error) {
         onError("Failed to delete seats", error);
     }

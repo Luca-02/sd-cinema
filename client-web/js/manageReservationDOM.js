@@ -2,6 +2,7 @@ const PROJ_MANAGE_INPT_ID = "id-proiezione-mod";
 const RESERVATION_MANAGE_INPT_ID = "id-prenotazione-mod";
 const SEATSID_TO_DELETE_INPT_ID = "id-posti-da-cancellare";
 const SEATS_TO_DELETE_INPT_ID = "posti-da-cancellare";
+const TXT_RESERVATION_INFO_ID = "info-modifica-prenotazione";
 
 function newManageSeatCheckbox(row, col, seatObj) {
     let checkbox = newSeatCheckboxInpt(row, col);
@@ -53,7 +54,13 @@ function showManageReservation() {
     changePanel("manage-reservation", PANEL_IDS);
 }
 
-function showEditReservationSubPanel(reservation, room, projId) {
+function showEditReservationSubPanel(reservation, room, projObj, movieObj) {
+    let projId = projObj["id"];
+
+    let reservationInfo = movieObj["film"] + "\n" +
+        projObj["data"] + " - " + projObj["orario"] + "\n" +
+        "Sala: " + room["id"];
+
     cleanManageReservationSubPanel();
 
     const seatsMatrix = createSeatsMatrix([reservation], room.rows,
@@ -65,6 +72,7 @@ function showEditReservationSubPanel(reservation, room, projId) {
     setInputValue(PROJ_MANAGE_INPT_ID, projId);
     setInputValue(RESERVATION_MANAGE_INPT_ID, reservation.id);
 
+    setInnerText(TXT_RESERVATION_INFO_ID, reservationInfo);
     document.getElementById("div-modifica-prenotazione")
         .style.display = "block";
 }
@@ -74,6 +82,7 @@ function cleanManageReservationPanel() {
 }
 
 function cleanManageReservationSubPanel() {
+    clearInnerText(TXT_RESERVATION_INFO_ID);
     clearTableById("tabella-modifica-prenotazione");
     cleanInptValue(SEATS_TO_DELETE_INPT_ID);
     cleanInptValue(SEATSID_TO_DELETE_INPT_ID);

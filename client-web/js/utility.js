@@ -119,3 +119,11 @@ function timeGreaterThan(time1, time2){
 
     return false;
 }
+
+function clearInnerText(elId){
+    document.getElementById(elId).innerText = "";
+}
+
+function setInnerText(elId, content){
+    document.getElementById(elId).innerText = content;
+}

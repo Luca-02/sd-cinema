@@ -22,7 +22,7 @@ function addProjectionDOM(projection, reserveCb) {
     newReserveButtonCell(row, projection["id"], projection["idSala"], reserveCb);
 }
 
-//callback ha come parametro projectionId
+//callback ha come parametro projectionId e roomId
 //ritorna l'oggetto {"reservations": [..], "room": room, "projId": id }
 function newReserveButtonCell(row, projId, roomId, callback) {
     const button = document.createElement("button");
