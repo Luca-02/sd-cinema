@@ -76,15 +76,17 @@ public class Prenotazione implements Comparable<Prenotazione>, IEntity {
         orario = currentTime.format(formatter1);
     }
 
-    public boolean correctDateTimeFormat() {
-        boolean check = true;
-        try {
-            formattedData();
-            formattedTime();
-        } catch (ParseException e) {
-            check = false;
+    public boolean validDateTime(Proiezione proiezione)
+            throws ParseException {
+        if (formattedData().before(proiezione.formattedData())) {
+            return true;
         }
-        return check;
+        else {
+            if (formattedData().equals(proiezione.formattedData()))
+                return formattedTime().before(proiezione.formattedTime());
+            else
+                return false;
+        }
     }
 
     @Override

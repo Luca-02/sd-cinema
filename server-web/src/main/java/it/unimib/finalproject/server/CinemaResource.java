@@ -47,14 +47,31 @@ public class CinemaResource {
         }
     }
 
-/*
+
     @Path("/film")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addFilm(String body) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
+        try {
+            Film film = hr.parseEntity(body, Film.class);
+            Response responseCode;
+
+            synchronized (this) {
+                responseCode = hr.dbAddFilm(film);
+            }
+
+            return responseCode;
+        } catch (JsonParseException | JsonMappingException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (IOException | URISyntaxException | InterruptedException e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
     }
-*/
     
     @Path("/film/{id}")
     @GET
@@ -94,14 +111,30 @@ public class CinemaResource {
         }
     }
 
-/*
     @Path("/sala")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addSala(String body) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
+        try {
+            Sala sala = hr.parseEntity(body, Sala.class);
+            Response responseCode;
+
+            synchronized (this) {
+                responseCode = hr.dbAddSala(sala);
+            }
+
+            return responseCode;
+        } catch (JsonParseException | JsonMappingException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (IOException | URISyntaxException | InterruptedException e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
     }
-*/
     
     @Path("/sala/{id}")
     @GET
@@ -141,14 +174,32 @@ public class CinemaResource {
         }
     }
 
-/*
+
     @Path("/proiezione")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addProiezione(String body) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
+        try {
+            Proiezione proiezione = hr.parseEntity(body, Proiezione.class);
+            Response responseCode;
+
+            synchronized (this) {
+                responseCode = hr.dbAddProiezione(proiezione);
+            }
+
+            return responseCode;
+        } catch (JsonParseException | JsonMappingException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (IOException | URISyntaxException | InterruptedException e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
     }
-*/
+
 
     @Path("/proiezione/{id}")
     @GET
@@ -214,7 +265,7 @@ public class CinemaResource {
         } catch (JsonParseException | JsonMappingException e) {
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).build();
-        } catch (IOException | URISyntaxException | InterruptedException e) {
+        } catch (IOException | URISyntaxException | InterruptedException | ParseException e) {
             e.printStackTrace();
             return Response.serverError().build();
         }
@@ -256,32 +307,41 @@ public class CinemaResource {
         }
     }
 
-    /* - */
+    /* - Posto - */
 
     @Path("prenotazione/{id}/posto")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosto(@PathParam("id") int idPrenotazione) {
-//        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT, mapper);
-//
-//        try {
-//            List<Posto> posti = hr.dbGetPostiPrenotati(idProiezione, idPrenotazione);
-//
-//            return Response.ok(posti).build();
-//        } catch (IOException | InterruptedException e) {
-//            e.printStackTrace();
-//            return Response.serverError().build();
-//        }
-        return null;
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
+        try {
+            List<Posto> posti = hr.dbGetAllPosto(idPrenotazione);
+            Collections.sort(posti);
+
+            return Response.ok(posti).build();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
     }
 
-    @Path("/proiezione/{id}/prenotazione/{id2}/posto/{id3}")
+    @Path("/prenotazione/{id1}/posto/{id2}")
     @DELETE
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deletePostoPrenotazione(@PathParam("id") int idProiezione,
-                                            @PathParam("id2") int idPrenotazione,
-                                            @PathParam("id3") int idPosto) {
-        return null;
+    public Response deletePostoPrenotazione(@PathParam("id1") int idPrenotazione,
+                                            @PathParam("id2") int idPosto) {
+        HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
+
+        try {
+            boolean check = hr.dbDeletePosto(idPrenotazione, idPosto);
+            if (check)
+                return Response.noContent().build();
+            else
+                return Response.status(Response.Status.NOT_FOUND).build();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
     }
 
 }

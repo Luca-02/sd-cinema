@@ -1,35 +1,31 @@
 package it.unimib.finalproject.server.test;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import it.unimib.finalproject.server.entities.Prenotazione;
+import it.unimib.finalproject.server.entities.Proiezione;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
 
 public class Test {
 
     public static void main(String[] args) throws ParseException {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            String file = "database.json";
 
-            String json = new String(Files.readAllBytes(Paths.get(file)));
+            Proiezione proiezione = new Proiezione();
+            proiezione.setId(0);
+            proiezione.setIdFilm(0);
+            proiezione.setIdSala(0);
+            proiezione.setData("2020-12-12");
+            proiezione.setOrario("20:00");
 
-            // convert JSON string to Map
-            Map<String, String> map = mapper.readValue(json, Map.class);
+            Prenotazione prenotazione = new Prenotazione();
+            prenotazione.setId(0);
+            prenotazione.setIdProiezione(0);
+            prenotazione.setData("2020-12-13");
+            prenotazione.setOrario("19:00");
+            prenotazione.setPosti(new ArrayList<>());
 
-            System.out.println(map.size());
+            System.out.println(prenotazione.validDateTime(proiezione));
 
         } catch (Exception ex) {
             ex.printStackTrace();
