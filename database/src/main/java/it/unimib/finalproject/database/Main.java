@@ -19,7 +19,9 @@ public class Main {
     /**
      * Porta di ascolto.
      */
+    public static final String HOSTNAME = "localhost";
     public static final int PORT = 3030;
+
     public static final int BUFFER_SIZE = 1024;
 
     public static ConcurrentHashMap<String, String> database = new ConcurrentHashMap<>();
@@ -164,7 +166,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             populateDatabase();
-            startServer("localhost", PORT);
+            startServer(HOSTNAME, PORT);
         } catch (IOException e) {
             e.printStackTrace();
         }

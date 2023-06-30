@@ -106,6 +106,15 @@ public class HandlerRequest {
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
+    public boolean dbExistsFilm(int id)
+            throws IOException, InterruptedException {
+        String command = "MEXISTS film:" + id;
+
+        String[] response =
+                HandlerResponse.parseResponse(socketRequest(command));
+        return HandlerResponse.responseIsTrue(response);
+    }
+
     /* - Sala - */
 
     public List<Sala> dbGetAllSala()
@@ -148,6 +157,15 @@ public class HandlerRequest {
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
+    public boolean dbExistsSala(int id)
+            throws IOException, InterruptedException {
+        String command = "MEXISTS sala:" + id;
+
+        String[] response =
+                HandlerResponse.parseResponse(socketRequest(command));
+        return HandlerResponse.responseIsTrue(response);
+    }
+
     /* - Proiezione - */
 
     public List<Proiezione> dbGetAllProiezione()
@@ -176,15 +194,23 @@ public class HandlerRequest {
     }
 
     public Response dbAddProiezione(Proiezione proiezione)
-            throws IOException, InterruptedException, URISyntaxException {
-        // TODO: fare in modo che non siano accavallate
+            throws IOException, InterruptedException, URISyntaxException, ParseException {
         String command;
         String[] response;
 
         List<Proiezione> proiezioneList = dbGetAllProiezione();
         proiezione.setId(generateNewId(proiezioneList));
 
-        if (proiezione.notNullAttributes()) {
+        if (!dbExistsFilm(proiezione.getIdFilm()) ||
+                !dbExistsSala(proiezione.getIdSala()))
+            return Response.status(Response.Status.NOT_FOUND).build();
+
+        if (proiezione.notNullAttributes() &&
+                proiezione.correctDateTimeFormat()) {
+
+            if (!proiezione.overlapProiezione(proiezioneList, dbGetAllFilm()))
+                return Response.status(Response.Status.CONFLICT).build();
+
             command = "MSET proiezione:" + proiezione.getId() + " " + proiezione;
             response = sendDbRequest(command);
 
@@ -235,7 +261,6 @@ public class HandlerRequest {
 
         List<Prenotazione> prenotazioneList = dbGetAllPrenotazione();
         prenotazione.initCurrentDateTime();
-
         prenotazione.setId(generateNewId(prenotazioneList));
 
         if (!dbExistsProiezione(prenotazione.getIdProiezione()))

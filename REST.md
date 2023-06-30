@@ -6,24 +6,24 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
 
 * ### GET
 
-    - **Descrizione**: Restituisce l'elenco di tutti i film.
+    - **Descrizione**: restituisce l'elenco di tutti i film.
     
-    - **Parametri**: None
+    - **Parametri**: none
     
-    - **Body richiesta**: None
-    
-    - **Risposta**: Viene restituita una lista JSON di tutti i film, nel formato
+    - **Body richiesta**: none
+
+    - **Risposta**: viene restituita una lista JSON di tutti i film, nel formato
 
           [
-            {
-              "id": [int],
-              "film": [string],
-              "durataMinuti": [int]
-            },
-            ...
+              {
+                  "id": [int],
+                  "film": [string],
+                  "durataMinuti": [int]
+              },
+              ...
           ]
 
-  - **Codici di stato restituiti**:
+    - **Codici di stato restituiti**:
       * `200 OK`
 
 * ### POST
@@ -35,8 +35,8 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
   - **Body richiesta**: rappresentazione in formato JSON del film del tipo
 
         {
-          "film": [string],
-          "durataMinuti": [int]
+            "film": [string],
+            "durataMinuti": [int]
         }
 
     il parametro `id` sarà generato automaticamente dal server che lo renderà unico.
@@ -55,14 +55,14 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
   
   - **Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo del film da restituire.
   
-  - **Body richiesta**: None
+  - **Body richiesta**: none
   
   - **Risposta**: In caso di successo viene restituita la rappresentazione in JSON del film, nel formato
-  
+
         {
-          "id": [int],
-          "film": [string],
-          "durataMinuti": [int]
+            "id": [int],
+            "film": [string],
+            "durataMinuti": [int]
         }
 
   - **Codici di stato restituiti**:
@@ -73,13 +73,13 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
 
 * ### GET
 
-    - **Descrizione**: Restituisce l'elenco di tutte le sale.
+    - **Descrizione**: restituisce l'elenco di tutte le sale.
 
-    - **Parametri**: None
+    - **Parametri**: none
 
-    - **Body richiesta**: None
+    - **Body richiesta**: none
 
-    - **Risposta**: Viene restituita una lista JSON di tute le sale, nel formato
+    - **Risposta**: viene restituita una lista JSON di tutte le sale, nel formato
 
           [
               {
@@ -124,7 +124,7 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
 
     - **Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo della sala da restituire.
 
-    - **Body richiesta**: None
+    - **Body richiesta**: none
 
   - **Risposta**: In caso di successo viene restituita la rappresentazione in JSON della sala, nel formato
 
@@ -143,13 +143,13 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
 
 * ### GET
 
-    - **Descrizione**: Restituisce l'elenco di tutte le proiezioni.
+    - **Descrizione**: restituisce l'elenco di tutte le proiezioni.
 
-    - **Parametri**: None
+    - **Parametri**: none
 
-    - **Body richiesta**: None
+    - **Body richiesta**: none
 
-    - **Risposta**: Viene restituita una lista JSON di tute le proiezioni, nel formato
+    - **Risposta**: viene restituita una lista JSON di tute le proiezioni, nel formato
 
           [
               {
@@ -159,7 +159,7 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
                   "data": [string],
                   "orario": [string]
               },
-            ...
+              ...
           ]
 
     - **Codici di stato restituiti**:
@@ -186,8 +186,10 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
 
   - **Codici di stato restituiti**:
       * `201 Created`
-      * `400 Bad Request`: c'è un errore del client, il formato JSON errato, c'è un campo errato o mancante.
-
+      * `400 Bad Request`: c'è un errore del client, il for.mato JSON errato, c'è un campo errato o mancante
+      * `404 Not Found`: i parametri `idFilm` o `idSala` specificati non sono correlati a nessun film o sala esistenti.
+      * `409 Conflict`: la proiezione che si vuole aggiungere si accavalla ad altre proiezioni già esistenti.
+      
 ## `/api/proiezione/{id}`
 
 * ### GET
@@ -216,16 +218,15 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
 
 * ### GET
 
-    - **Descrizione**: Restituisce l'elenco di tutte le prenotazioni.
+    - **Descrizione**: se la query della richiesta non è specificata restituisce l'elenco di tutte le prenotazioni,
+  altrimenti restituisce l'elenco di tutte le prenotazioni che hanno il parametro `idProiezione` uguale a `id`.
 
-    - **Parametri**: se viene specificato nella query della richiesta il valore di `idProiezione` dato da `{id}` 
-  che rappresenta un identificativo della proieizone, allora verrà restituito l'elenco di tutte le prenotazioni 
-  che hanno `idProiezione = {id}`, altrimenti se la query non è specificata verrà restituito l'elenco di tutte le 
-  prenotazioni.
+    - **Parametri**: un parametro nella query della richiesta `id` che rappresenta il parametro `idProiezione`
+  delle prenotazioni.
 
-    - **Body richiesta**: None
+    - **Body richiesta**: none
 
-    - **Risposta**: Viene restituita una lista JSON di tute le prenotazioni, nel formato
+    - **Risposta**: viene restituita una lista JSON di tute le prenotazioni, nel formato
 
           [
               {
@@ -242,7 +243,7 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
                       ...
                   ]
               },
-            ...
+              ...
           ]
 
     - **Codici di stato restituiti**:
@@ -269,27 +270,28 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
 
         il parametro `id` delle prenotazioni e dei posti sarà generato automaticamente dal server che lo renderà unico.
     I parametri `data` e `orario` saranno inizializzati automaticamente alla data e ora attuali nel momento della 
-    richiesta 
+    richiesta.
 
     - **Risposta**: in caso di successo il body è vuoto e la risorsa creata è indicata nell'header `Location`.
 
     - **Codici di stato restituiti**:
         * `201 Created`
-        * `400 Bad Request`: c'è un errore del client, il formato JSON errato, c'è un campo errato o mancante oppure 
-      i posti specificati nella prenotazione non sono validi o sono già prenotati.
-        * `404 Not Found`: `idProiezione` specificato nella richiesta non è correlato a nessuna proiezione esistente.
+        * `400 Bad Request`: c'è un errore del client, il formato JSON errato, c'è un campo errato o mancante, 
+      i posti specificati nella prenotazione non sono validi o sono già prenotati oppure la proiezione a cui ci si 
+      vuole prenotare è già passata rispetto alla data e l'orario attuale della prenotazione.
+        * `404 Not Found`: il parametro `idProiezione` specificato non è correlato a nessuna proiezione esistente.
 
 ## `/api/prenotazione/{id}`
 
 * ### GET
 
-    - **Descrizione**: restituisce la prenotazione con l'`id` fornito.
+    - **Descrizione**: restituisce la prenotazione (e i posti annessi) con l'`id` fornito.
 
     - **Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo della prenotazione da restituire.
 
-    - **Body richiesta**: None
+    - **Body richiesta**: none
 
-    - **Risposta**: In caso di successo viene restituita la rappresentazione in JSON della prenotazione, nel formato
+    - **Risposta**: in caso di successo viene restituita la rappresentazione in JSON della prenotazione, nel formato
 
           {
               "id": [int],
@@ -306,10 +308,64 @@ Documentazione delle API REST. Si assume che i dati vengano scambiati in formato
               ]
           }
 
-      - **Codici di stato restituiti**:
-          * `200 OK`
-          * `404 Not Found`: prenotazione non trovata.
+    - **Codici di stato restituiti**:
+        * `200 OK`
+        * `404 Not Found`: prenotazione non trovata.
+
+* ### DELETE
+
+    - **Descrizione**: elimina la prenotazione (e i posti annessi) con l'`id` fornito dalla base di dati.
+
+    - **Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo della prenotazione da eliminare.
+
+    - **Body richiesta**: none
+
+    - **Risposta**: in caso di successo il body è vuoto
+
+    - **Codici di stato restituiti**:
+        * `204 No Content`: prenotazione (e i posti annessi) eliminata correttamente.
+        * `404 Not Found`: prenotazione non trovata.
 
 ## `/api/prenotazione/{id}/posto`
 
+* ### GET
+
+    - **Descrizione**: restituisce l'elenco di tutti i posti di una determinata prenotazione.
+
+    - **Parametri**: un parametro nel percorso `id` che rappresenta l'identificativo della prenotazione della quale
+  si vogliono restituire i posti.
+
+    - **Body richiesta**: none
+
+    - **Risposta**: viene restituita una lista JSON di tute le proiezioni, nel formato
+
+          [
+              {
+                  "id": 0,
+                  "row": 0,
+                  "column": 0
+              },
+              ...
+          ]
+
+    - **Codici di stato restituiti**:
+        * `200 OK`
+
 ## `/api/prenotazione/{id1}/posto/{id2}`
+
+* ### DELETE
+
+    - **Descrizione**: elimina il posto con l'`id2` fornito rispetto a una prenotazione con l'`id1` fornito dalla base di
+  dati, se dopo l'eliminazione del posto la prenotazione con l'`id1` non contiene più nessun posto, verrà eliminata anche
+  la prenotazione con l'`id1` dalla base di dati.
+
+    - **Parametri**: un parametro nel percorso `id1` che rappresenta l'identificativo della prenotazione e un parametro
+  `id2` che rappresenta l'identificativo del posto da eliminare.
+
+    - **Body richiesta**: none
+
+    - **Risposta**: in caso di successo il body è vuoto
+
+    - **Codici di stato restituiti**:
+        * `204 No Content`: prenotazione (e i posti annessi) eliminata correttamente.
+        * `404 Not Found`: prenotazione o posto non trovati.

@@ -14,10 +14,10 @@ Il server Web e il database sono dei progetti Java che utilizano Maven per gesti
 per compilare ed eseguire: `clean`, che rimuove la cartella `target`, `compile` per compilare e `exec:java` per avviare il componente.
 
 I tre obiettivi possono essere eseguiti insieme in una sola riga di comando da terminale tramite `./mvnw clean compile exec:java` per Linux/Mac e `mvnw.cmd clean compile exec:java` per Windows. 
-L'unico requisito è un'istallazione di Java (versione da noi utilizzata: `17.0`), verificando che la variabile `JAVA_PATH` sia correttamente configurata. Il nostro gruppo come sistema operativo principale
+L'unico requisito è un'istallazione di Java (versione da noi utilizzata: `17.0`, versione indicata da maven: `11`), verificando che la variabile `JAVA_PATH` sia correttamente configurata. Il nostro gruppo come sistema operativo principale
 ha utilizzato Windows.
 
-Il client Web è invece un solo file HTML chiamato `index.html`, può essere aperto su un qualsiasi browser. È importante disabilitare CORS, come mostrato nel laboratorio 8 su JavaScript (AJAX).
+Il client Web è invece un solo file HTML chiamato `index.html`, può essere aperto su un qualsiasi browser. **È importante disabilitare CORS**, come mostrato nel laboratorio 8 su JavaScript (AJAX).
 
 ## Porte e indirizzi
 

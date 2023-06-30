@@ -86,14 +86,19 @@ public class HandlerRequest {
     }
 
     public static String handleMSDEL(String parameters) {
+        boolean check = false;
         for (Map.Entry<String, String> entry : Main.database.entrySet()) {
             if (entry.getKey().contains(parameters)) {
-                String check = Main.database.remove(entry.getKey());
-                if (check == null)
-                    return falseResponseMessage;
+                String removedField = Main.database.remove(entry.getKey());
+                if (removedField != null)
+                    check = true;
             }
         }
-        return trueResponseMessage;
+
+        if (check)
+            return trueResponseMessage;
+        else
+            return falseResponseMessage;
     }
 
     public static String handleMEXISTS(String parameters) {

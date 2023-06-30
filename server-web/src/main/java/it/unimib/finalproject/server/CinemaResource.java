@@ -189,7 +189,7 @@ public class CinemaResource {
         } catch (JsonParseException | JsonMappingException e) {
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).build();
-        } catch (IOException | URISyntaxException | InterruptedException e) {
+        } catch (IOException | URISyntaxException | InterruptedException | ParseException e) {
             e.printStackTrace();
             return Response.serverError().build();
         }
@@ -328,29 +328,29 @@ public class CinemaResource {
         HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
 
         try {
-            Response responseCode;
             boolean check = hr.dbDeletePosto(idPrenotazione, idPosto);
 
-            synchronized (this) {
-                if (check) {
-                    Prenotazione prenotazione = hr.dbGetPrenotazioneById(idPrenotazione);
+            if (check) {
+                Prenotazione prenotazione = hr.dbGetPrenotazioneById(idPrenotazione);
+                if (prenotazione != null) {
                     if (prenotazione.getPosti().size() == 0) {
                         check = hr.dbDeletePrenotazione(idPrenotazione);
                         if (check)
-                            responseCode = Response.noContent().build();
+                            return Response.noContent().build();
                         else
-                            responseCode = Response.status(Response.Status.NOT_FOUND).build();
+                            return Response.status(Response.Status.NOT_FOUND).build();
                     }
                     else {
-                        responseCode = Response.noContent().build();
+                        return Response.noContent().build();
                     }
                 }
                 else {
-                    responseCode = Response.status(Response.Status.NOT_FOUND).build();
+                    return Response.status(Response.Status.NOT_FOUND).build();
                 }
             }
-
-            return responseCode;
+            else {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return Response.serverError().build();
