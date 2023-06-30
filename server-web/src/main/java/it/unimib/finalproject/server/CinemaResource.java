@@ -328,11 +328,29 @@ public class CinemaResource {
         HandlerRequest hr = new HandlerRequest(HOSTNAME, PORT);
 
         try {
+            Response responseCode;
             boolean check = hr.dbDeletePosto(idPrenotazione, idPosto);
-            if (check)
-                return Response.noContent().build();
-            else
-                return Response.status(Response.Status.NOT_FOUND).build();
+
+            synchronized (this) {
+                if (check) {
+                    Prenotazione prenotazione = hr.dbGetPrenotazioneById(idPrenotazione);
+                    if (prenotazione.getPosti().size() == 0) {
+                        check = hr.dbDeletePrenotazione(idPrenotazione);
+                        if (check)
+                            responseCode = Response.noContent().build();
+                        else
+                            responseCode = Response.status(Response.Status.NOT_FOUND).build();
+                    }
+                    else {
+                        responseCode = Response.noContent().build();
+                    }
+                }
+                else {
+                    responseCode = Response.status(Response.Status.NOT_FOUND).build();
+                }
+            }
+
+            return responseCode;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return Response.serverError().build();
