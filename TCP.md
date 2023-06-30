@@ -6,7 +6,7 @@ Documentazione del protoccolo socket su TCP.
 
 Il protocollo costruito per la comunicazione tra server-web e database prende ispirazione dal
 protocollo di [Redis](https://redis.io/docs/reference/protocol-spec/) in particolar modo alla gestione
-di una tabella di [Hash](https://redis.io/docs/data-types/hashes/).
+di una tabella di [hash](https://redis.io/docs/data-types/hashes/).
 
 - È basato su una richiesta da parte di un client posto nel server-web, e una risposta da parte di un server
 posto nel database;
@@ -33,7 +33,7 @@ sul database sul rispettivo host e porta.
 La **socket** del server posto nel database rimarrà in ascolto sull'**host** `localhost` e sulla **porta** 3030 per soddisfare le richieste
 che richiedono i client client.
 
-La risposta del server è una stringa che varierà in base al comando da eseguire richiesto dal client.
+- La risposta del server è una stringa che varierà in base al comando da eseguire richiesto dal client.
 
 ### Comandi
 
