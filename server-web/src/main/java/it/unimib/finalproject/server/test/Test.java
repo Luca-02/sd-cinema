@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -20,18 +21,13 @@ public class Test {
 
     public static void main(String[] args) throws ParseException {
         try {
-            // create object mapper instance
             ObjectMapper mapper = new ObjectMapper();
+            String file = "database.json";
 
-            File path = Paths.get("database.json").toFile();
+            String json = new String(Files.readAllBytes(Paths.get(file)));
 
-            // convert JSON file to map
-            Map<String, String> map = mapper.readValue(path, Map.class);
-
-            // print map entries
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                System.out.println(entry.getKey() + " - " + entry.getValue());
-            }
+            // convert JSON string to Map
+            Map<String, String> map = mapper.readValue(json, Map.class);
 
             System.out.println(map.size());
 

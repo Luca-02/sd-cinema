@@ -10,7 +10,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,38 +31,9 @@ public class Main {
     /**
      * Popolo il database
      */
-    static {
-        database.put("film:0", "{\"id\": 0, \"film\": \"Il padrino\", \"durataMinuti\": 175}");
-        database.put("film:1", "{\"id\": 1, \"film\": \"Il Signore degli Anelli: Il ritorno del re\", \"durataMinuti\": 201}");
-        database.put("film:2", "{\"id\": 2, \"film\": \"Pulp Fiction \", \"durataMinuti\": 154}");
-        database.put("film:3", "{\"id\": 3, \"film\": \"Fight Club\", \"durataMinuti\": 139}");
-        database.put("film:4", "{\"id\": 4, \"film\": \"Titanic\", \"durataMinuti\": 194}");
-
-        database.put("sala:0", "{\"id\": 0, \"nome\": \"A\", \"rows\": 8, \"columns\": 8}");
-        database.put("sala:1", "{\"id\": 1, \"nome\": \"B\", \"rows\": 6, \"columns\": 5}");
-        database.put("sala:2", "{\"id\": 2, \"nome\": \"C\", \"rows\": 7, \"columns\": 6}");
-        database.put("sala:3", "{\"id\": 3, \"nome\": \"D\", \"rows\": 4, \"columns\": 8}");
-        database.put("sala:4", "{\"id\": 4, \"nome\": \"E\", \"rows\": 12, \"columns\": 6}");
-
-        database.put("proiezione:0", "{\"id\": 0, \"idFilm\": 2, \"idSala\": 1, \"data\": \"2022-12-20\", \"orario\": \"21:00\"}");
-        database.put("proiezione:1", "{\"id\": 1, \"idFilm\": 0, \"idSala\": 0, \"data\": \"2021-05-18\", \"orario\": \"21:00\"}");
-        database.put("proiezione:2", "{\"id\": 2, \"idFilm\": 3, \"idSala\": 3, \"data\": \"2020-02-03\", \"orario\": \"21:00\"}");
-        database.put("proiezione:3", "{\"id\": 3, \"idFilm\": 1, \"idSala\": 4, \"data\": \"2023-08-25\", \"orario\": \"21:00\"}");
-        database.put("proiezione:4", "{\"id\": 4, \"idFilm\": 4, \"idSala\": 2, \"data\": \"2019-11-04\", \"orario\": \"21:00\"}");
-
-        database.put("prenotazione:0", "{\"id\": 0, \"idProiezione\": 0, \"data\": \"2023-09-10\", \"orario\": \"20:00\"}");
-        database.put("prenotazione:1", "{\"id\": 1, \"idProiezione\": 0, \"data\": \"2023-10-10\", \"orario\": \"21:00\"}");
-        database.put("prenotazione:2", "{\"id\": 2, \"idProiezione\": 1, \"data\": \"2023-01-10\", \"orario\": \"18:00\"}");
-
-        database.put("prenotazione:0:posto:0", "{\"id\": 0, \"row\": 0, \"column\": 0}");
-        database.put("prenotazione:0:posto:1", "{\"id\": 1, \"row\": 0, \"column\": 1}");
-        database.put("prenotazione:0:posto:2", "{\"id\": 2, \"row\": 0, \"column\": 2}");
-
-        database.put("prenotazione:1:posto:0", "{\"id\": 0, \"row\": 1, \"column\": 0}");
-        database.put("prenotazione:1:posto:1", "{\"id\": 1, \"row\": 1, \"column\": 2}");
-
-        database.put("prenotazione:2:posto:0", "{\"id\": 0, \"row\": 3, \"column\": 2}");
-        database.put("prenotazione:2:posto:1", "{\"id\": 1, \"row\": 5, \"column\": 5}");
+    public static void populateDatabase() throws IOException {
+        String file = "../database.json";
+        database.putAll(HandlerDatabase.initDatabase(file));
     }
 
     public static void startServer(String address, Integer port) throws IOException {
@@ -193,10 +163,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-//            File path = Paths.get("database.json").toFile();
-
-
-//            HandlerDatabase.initDatabase("database.json");
+            populateDatabase();
             startServer("localhost", PORT);
         } catch (IOException e) {
             e.printStackTrace();
